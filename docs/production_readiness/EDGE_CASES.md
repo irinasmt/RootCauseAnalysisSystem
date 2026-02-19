@@ -3,12 +3,14 @@
 Edge cases are what separate a toy RCA bot from a tool SREs trust. The goal here is to **avoid unnecessary investigations**, **avoid LLM spend**, and **avoid wrong blame**.
 
 See also:
+
 - [Architecture overview](../architecture/ARCHITECTURE.md)
 - [Brain (RCA engine)](../brain/BRAIN.md)
 
 ## 0) "Ghost change" (manual kubectl / out-of-band mutation)
 
 Problem:
+
 - Someone runs `kubectl edit`, `kubectl set image`, `kubectl scale`, or `kubectl apply -f` from a laptop.
 - There is no CI/CD pipeline event, no GitHub webhook, no PR — the change leaves no git trail.
 - An incident fires shortly after and the correlator finds no `DeploymentEvent` to blame.
@@ -19,12 +21,12 @@ The K8s collector watches the API server (Deployments, ConfigMaps, Secrets, Repl
 
 By storing the previous spec and diffing, you know **exactly what changed**:
 
-| Resource | What you can diff |
-|---|---|
+| Resource   | What you can diff                                                         |
+| ---------- | ------------------------------------------------------------------------- |
 | Deployment | Image ref, env var names + values, resource limits, replica count, labels |
-| ConfigMap | Key names and values that changed |
-| Secret | Key names that changed only — **never store secret values** |
-| ReplicaSet | Replica count changes |
+| ConfigMap  | Key names and values that changed                                         |
+| Secret     | Key names that changed only — **never store secret values**               |
+| ReplicaSet | Replica count changes                                                     |
 
 **Who made the change** is only available if the cluster has [K8s audit logging](https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/) enabled. Without it you get what changed and when, but not the actor.
 
@@ -44,6 +46,7 @@ By storing the previous spec and diffing, you know **exactly what changed**:
 Before we invite the LLM (or even start deep correlation), we run a simple deterministic gate.
 
 Inputs (minimum):
+
 - RPS / request rate
 - 5xx error rate
 - p99 latency
@@ -57,6 +60,7 @@ Decision logic (concept):
 - If **Traffic ↑** AND **Error Rate ↑** → “Perfect storm” path (mixed causes)
 
 The Gatekeeper should return:
+
 - selected investigation path
 - whether to allow LLM (yes/no)
 - a short rationale (persist for audit)
@@ -66,19 +70,23 @@ The Gatekeeper should return:
 ## 1) “Viral Success” (traffic spikes)
 
 Problem:
+
 - CPU/memory and latency spike, but nothing changed.
 
 Cheap check (no LLM):
+
 - Compare **RPS change** vs **resource usage change**.
 - If `RPS > +30%` at the same time as CPU spike, treat this as a likely demand/capacity event first.
 
 Actions (infra persona):
+
 - Check HPA events: did we hit min/max replicas?
 - Check scaling lag: did replicas increase late?
 - Check DB pool saturation / max connections.
 - Check egress latency to critical dependencies (DB/external APIs).
 
 LLM policy:
+
 - Only run the Investigator if scaling checks cannot explain the symptoms.
 
 ---
@@ -86,6 +94,7 @@ LLM policy:
 ## 2) “Massive Release” (50+ commits / noisy diff)
 
 Problem:
+
 - Too many changes overwhelm the reasoning step; high hallucination risk.
 - Doing this analysis under incident pressure is slow and expensive.
 
@@ -115,6 +124,7 @@ Git_Scout never fetches or reads raw diffs during an incident. Instead:
 5. Raw `diff_text` is only fetched if the Synthesizer or Critic explicitly requests it as a follow-up.
 
 LLM policy:
+
 - Expensive model (GPT-4 / Claude) only ever sees commit summaries, never raw diffs.
 - If no pre-computed data exists for a commit range, Git_Scout logs a gap and falls back to infra/dependency hypotheses.
 
@@ -123,20 +133,24 @@ LLM policy:
 ## 3) “Silent dependency” failures (third-party/API)
 
 Problem:
+
 - Your code didn’t change, but a third-party dependency is slow.
 
 Signals:
+
 - Egress latency increases
 - timeouts to external hosts
 - downstream service p99 increases before upstream
 
 Handling:
+
 - Add a “Third-Party Health” tool:
   - check public status pages where appropriate
   - check synthetic probes (optional)
   - check egress latency metrics per destination
 
 LLM policy:
+
 - If dependency regression is clearly upstream, produce a report that avoids blaming internal commits.
 
 ---
@@ -144,9 +158,11 @@ LLM policy:
 ## 4) “Poison pill” request (rare input crashes pods)
 
 Problem:
+
 - 99.9% OK; one specific request pattern triggers OOM/crash.
 
 Handling:
+
 - Snapshot the last N requests/attributes before crash (where available):
   - endpoint
   - request size
@@ -154,6 +170,7 @@ Handling:
 - Run lightweight clustering / grouping to find common denominators.
 
 Outcome:
+
 - Flag as “Poison pill” and recommend:
   - input validation
   - per-request limits
@@ -164,11 +181,13 @@ Outcome:
 ## 5) “Heisenbug” (intermittent, disappears fast)
 
 Problem:
+
 - The anomaly is gone before deep analysis finishes.
 
 Fix: snapshotting (“Polaroid”)
 
 When the trigger fires:
+
 - Store a snapshot bundle immediately:
   - metrics window slices
   - pod/container state summary
@@ -182,9 +201,11 @@ Investigation should analyze the snapshot, not the live system.
 ## 6) “Cold start” delays (serverless / warm-up)
 
 Problem:
+
 - Latency spikes due to initialization, not a regression.
 
 Handling:
+
 - Check `init_duration` / cold start signals.
 - If cold start explains the majority of latency, report as cold start and suggest:
   - provisioned concurrency

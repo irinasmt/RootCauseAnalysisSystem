@@ -11,7 +11,7 @@ This project is building an RCA system with multiple stores, multiple integratio
 
 We will use **Spec-Driven Development (SDD)**.
 
-- Specs are written/updated *before* implementation work.
+- Specs are written/updated _before_ implementation work.
 - Specs live in `specs/` and are versioned alongside code.
 - Acceptance criteria in specs are represented in tests.
 - A PR that changes behavior/contracts must update the relevant spec(s).

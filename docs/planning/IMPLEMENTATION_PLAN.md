@@ -17,6 +17,7 @@ This plan is written for developers. It turns the architecture into an executabl
 Goal: an end-to-end “incident → investigation → report” loop using mocked collectors and deterministic evidence bundles.
 
 Deliverables
+
 - A single canonical **Incident Scenario** (fixture):
   - Service `checkout`
   - Deployment at `T0`
@@ -29,6 +30,7 @@ Deliverables
   - `RCAReport`
 
 Definition of done
+
 - The pipeline can produce the same report from the same fixture (deterministic mode).
 - Every hypothesis line includes at least one evidence reference.
 
@@ -39,6 +41,7 @@ Definition of done
 Goal: lock storage shapes and API shapes early to avoid thrash.
 
 Deliverables
+
 - Data model spec: see `../data_structure/DATA_MODELS.md`
 - Human feedback spec: see `../human_feedback/HUMAN_FEEDBACK.md`
 - API contract spec (minimal):
@@ -49,6 +52,7 @@ Deliverables
   - Add feedback events (confirm/reject/root-cause/note)
 
 Definition of done
+
 - All major entities have stable IDs, timestamps, and referential links.
 - A report can be stored and retrieved strictly from storage references.
 
@@ -59,11 +63,13 @@ Definition of done
 Goal: ingest “just enough” signal to catch the most common case: deploy caused regression.
 
 Deliverables
+
 - K8s deploy watcher design (events → normalized `DeploymentEvent`)
 - Git change fetcher design (commit/PR metadata → normalized `Commit`)
 - Metrics fetcher design (Prometheus query plan → normalized `MetricPoint`)
 
 Definition of done
+
 - For a single service, you can obtain:
   - deploy timestamps + image metadata
   - a best-effort commit revision
@@ -76,6 +82,7 @@ Definition of done
 Goal: open incidents cheaply and reliably; only investigate when it’s worth it.
 
 Deliverables
+
 - Trigger candidate rules:
   - p99 regression and/or error-rate spike
   - deploy proximity rule
@@ -86,6 +93,7 @@ Deliverables
   - known-flaky suppression
 
 Definition of done
+
 - Incidents are created with clear “why triggered” rationale.
 - False positives are suppressed with a recorded reason.
 
@@ -96,11 +104,13 @@ Definition of done
 Goal: a minimal LangGraph flow that produces ranked hypotheses with citations.
 
 Deliverables
+
 - Brain graph spec aligned to `../brain/BRAIN.md`:
   - Supervisor → Git_Scout + Metric_Analyst → Synthesizer → Critic
 - Critic “disprove first” checklist (documented) and loop bounds.
 
 Definition of done
+
 - Investigator produces:
   - ranked hypotheses + confidence
   - narrative report
@@ -113,6 +123,7 @@ Definition of done
 Goal: the UI can render incidents, hypotheses, and evidence without bespoke logic.
 
 Deliverables
+
 - UI data requirements finalized:
   - timeline objects
   - evidence cards
@@ -120,6 +131,7 @@ Deliverables
   - feedback actions + audit log view
 
 Definition of done
+
 - UI can be built against stable API contracts and sample JSON from fixtures.
 
 ---

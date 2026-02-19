@@ -149,15 +149,18 @@ SDD is how we keep an AI-heavy system grounded and maintainable.
 - When implementation diverges from a spec, **the spec must be updated** (or the change is incomplete).
 
 Spec naming:
+
 - Follow the conventions in `specs/README.md` (kebab-case; ADRs as `ADR-####-title.md`).
 
 What counts as a “spec change”:
+
 - API shape changes (request/response)
 - event payload/schema changes
 - storage/schema changes
 - investigation/brain behavior that affects user-visible outputs
 
-What does *not* require a spec change:
+What does _not_ require a spec change:
+
 - pure refactors with identical behavior
 - comments, formatting, lint-only changes
 

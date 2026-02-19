@@ -26,22 +26,22 @@ Keep spec filenames boring and consistent:
 Recommended patterns by folder:
 
 - `specs/features/`
-	- `feature-<short-scope>.md`
-	- Examples: `feature-incident-lifecycle-v0.md`, `feature-fixture-first-workflow.md`
+  - `feature-<short-scope>.md`
+  - Examples: `feature-incident-lifecycle-v0.md`, `feature-fixture-first-workflow.md`
 
 - `specs/interfaces/`
-	- `api-<surface>.md` for HTTP APIs
-	- `event-<event-name>.md` for event payloads
-	- `tool-<tool-name>.md` for agent/tool contracts
-	- Examples: `api-incidents.md`, `event-deployment-event.md`, `tool-git-scout.md`
+  - `api-<surface>.md` for HTTP APIs
+  - `event-<event-name>.md` for event payloads
+  - `tool-<tool-name>.md` for agent/tool contracts
+  - Examples: `api-incidents.md`, `event-deployment-event.md`, `tool-git-scout.md`
 
 - `specs/data/`
-	- `<store>-<topic>.md`
-	- Examples: `postgres-incidents.md`, `clickhouse-metric-points.md`, `qdrant-collections.md`
+  - `<store>-<topic>.md`
+  - Examples: `postgres-incidents.md`, `clickhouse-metric-points.md`, `qdrant-collections.md`
 
 - `specs/decisions/`
-	- ADRs only: `ADR-####-<short-title>.md`
-	- Example: `ADR-0001-sdd.md`
+  - ADRs only: `ADR-####-<short-title>.md`
+  - Example: `ADR-0001-sdd.md`
 
 ## Minimum bar for a change
 

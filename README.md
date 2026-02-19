@@ -6,7 +6,7 @@ An open-source, Kubernetes-first Root Cause Analysis (RCA) system that:
 
 - Detects production anomalies (CPU/memory spikes, latency regressions, error-rate increases)
 - Correlates anomalies with recent changes (deployments/releases and git commits)
-- Produces an evidence-backed “best explanation” of *what likely caused the incident* and *why*
+- Produces an evidence-backed “best explanation” of _what likely caused the incident_ and _why_
 - Works with minimal prerequisites (start with metrics + deploy events + git), then optionally deepens accuracy with traces/logs later
 
 ## Docs
@@ -42,7 +42,7 @@ An open-source, Kubernetes-first Root Cause Analysis (RCA) system that:
 
 ## Why this exists
 
-Most observability tools can tell you *something is wrong*. This project aims to answer:
+Most observability tools can tell you _something is wrong_. This project aims to answer:
 
 > “Which change caused this, and what evidence supports that conclusion?”
 

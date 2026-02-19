@@ -17,12 +17,14 @@ The Brain is designed to avoid the “commodity trap” by being **self-correcti
 
 ### Core nodes (SRE teammates)
 
-1) **Supervisor (Orchestrator)**
+1. **Supervisor (Orchestrator)**
+
 - Input: `ApprovedIncident` (service, trigger type, anomaly window, severity, deploy proximity)
 - Responsibility: pick the next best worker(s) to run, based on the trigger and what evidence is missing.
 - Output: a `TaskPlan` (which workers to run and in what order)
 
-2) **Git_Scout (Code worker)**
+2. **Git_Scout (Code worker)**
+
 - Resolves the deployment's commit range (`previous_revision..revision`) from the pre-computed store.
 - Does **not** fetch or analyze raw diffs at incident time — that work is already done at push time.
 - Queries pre-computed `commit_files`, filtered by the `change_type` values most relevant to the active anomaly type (e.g., `db_migration` + `timeout_retry` for a p99 regression).
@@ -31,14 +33,16 @@ The Brain is designed to avoid the “commodity trap” by being **self-correcti
 - Fetches raw `diff_text` on demand only if the Synthesizer or Critic explicitly requests it.
 - Handles the rollback case: if `is_rollback = true`, reports what code was removed, not what was added.
 
-3) **Metric_Analyst (Live metrics worker)**
+3. **Metric_Analyst (Live metrics worker)**
+
 - Queries ClickHouse (and/or Prometheus for near-real-time) for:
   - RED metrics (rate, errors, duration)
   - CPU/memory saturation signals
   - downstream dependency signals (if known)
 - Characterizes anomaly “shape” (step spike vs slow creep) and correlates with deploy timestamps.
 
-4) **RCA_Synthesizer (Reasoner)**
+4. **RCA_Synthesizer (Reasoner)**
+
 - Combines outputs from Git_Scout + Metric_Analyst.
 - Produces a ranked set of hypotheses:
   - “Release X caused regression in service Y”
@@ -46,7 +50,8 @@ The Brain is designed to avoid the “commodity trap” by being **self-correcti
   - “DB lock/slow query after schema change”
 - Outputs: `HypothesisSet` with confidence + evidence references.
 
-5) **The_Critic (Validation node)**
+5. **The_Critic (Validation node)**
+
 - Primary job: **disprove** the Synthesizer.
 - Checks for simpler explanations and evidence gaps:
   - “Are metrics normal for the accused service?”
@@ -82,10 +87,12 @@ The Brain is designed to avoid the “commodity trap” by being **self-correcti
 Every node output is parsed/validated against a schema.
 
 Purpose:
+
 - prevents malformed outputs from breaking the pipeline
 - enforces required fields for downstream steps
 
 Examples of enforced fields:
+
 - commit SHA must match a valid pattern
 - timestamps must be present and parseable
 - evidence references must include source + query id
@@ -93,6 +100,7 @@ Examples of enforced fields:
 ### 2) Evidence Check (anti-handwaving)
 
 Critic verifies that the report contains at least:
+
 - 1+ **DeploymentEvent** IDs/timestamps (if using the “deploy proximity” trigger)
 - 1+ **Commit SHA** (when claiming code change)
 - 1+ metrics snapshot reference (ClickHouse query ID or materialized view)
@@ -127,6 +135,7 @@ If not, the hypothesis is downgraded or rejected.
 ### Brain input (from Trigger system)
 
 `ApprovedIncident` should minimally include:
+
 - `service_id`
 - `trigger_type` (e.g., `error_rate_spike`, `p99_regression`, `crashloop`)
 - `started_at`, `window_start`, `window_end`
@@ -151,9 +160,9 @@ Store responsibilities are defined in ../architecture/ARCHITECTURE.md.
 ## Implementation notes (practical MVP)
 
 - Start with a single LangGraph graph for the three main scenarios:
-  1) Bad code push (5xx spike)
-  2) Silent slowdown (p99 regression)
-  3) Config drift (CrashLoopBackOff)
+  1. Bad code push (5xx spike)
+  2. Silent slowdown (p99 regression)
+  3. Config drift (CrashLoopBackOff)
 
 - Keep workers deterministic where possible:
   - Git_Scout: mostly API calls + diff summarization

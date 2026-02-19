@@ -5,9 +5,10 @@ This document is for developers who want to iterate locally and validate the dat
 ## Recommended local dev mode
 
 Start in **mocked mode** (fixtures) and only then connect:
-1) mocked collectors → end-to-end report generation
-2) local databases (optional early)
-3) real Prometheus + K8s watch
+
+1. mocked collectors → end-to-end report generation
+2. local databases (optional early)
+3. real Prometheus + K8s watch
 
 ## Prerequisites
 
@@ -20,6 +21,7 @@ Start in **mocked mode** (fixtures) and only then connect:
 ## Local dependencies (concept)
 
 The architecture references:
+
 - PostgreSQL (incidents, decisions, artifacts)
 - ClickHouse (metrics + derived features)
 - Neo4j (topology + relationships)
@@ -38,20 +40,24 @@ Use environment variables (or a `.env`, if you prefer) with the following keys:
 - `QDRANT_URL` (example: `http://localhost:6333`)
 
 LLM (optional)
+
 - `LLM_PROVIDER` (example: `openai|anthropic|local`)
 - `LLM_API_KEY` (if applicable)
 - `LLM_MODEL` (example: `gpt-4.1-mini` or equivalent)
 
 ## Fixture-first workflow
 
-1) Choose a fixture scenario
+1. Choose a fixture scenario
+
 - Keep a canonical scenario for regression-after-deploy.
 - The fixture should include deploy event, metric window summary, and candidate commits.
 
-2) Run the Brain against the fixture
+2. Run the Brain against the fixture
+
 - Goal: validate schemas + report format before any infra integration.
 
-3) Store and retrieve results
+3. Store and retrieve results
+
 - Even in mocked mode, assume the report will be persisted and later retrieved by the UI.
 
 ## Connecting to real systems (later)

@@ -16,6 +16,7 @@ This project builds a Kubernetes-first RCA system that correlates **production p
 Runs in-cluster (Helm) or in the same VPC.
 
 Responsibilities:
+
 - Ingest signals (infra, code, DB)
 - Detect anomalies and open incidents
 - Correlate incidents with deployments/commits/config
@@ -26,6 +27,7 @@ Responsibilities:
 ### 2) UI (hosted or self-hosted)
 
 Responsibilities:
+
 - Incident list + status (open/triaged/resolved)
 - Ranked hypotheses (traffic vs release vs dependency vs DB)
 - “What changed?” view (deploy + commits + config changes)
@@ -33,11 +35,11 @@ Responsibilities:
 
 ## Data stores (the 4-database model)
 
-| DB | Type | Used for |
-|---|---|---|
-| Neo4j | Graph | Topology + relationships: Service → Dependency → DB, Deploy → Commit → Service |
-| ClickHouse | Columnar | High-volume metrics/features: p99, error rate, CPU/mem, traffic, derived anomaly features |
-| Qdrant | Vector | Embeddings: git diffs/PRs, runbooks, incident summaries (semantic retrieval) |
+| DB         | Type       | Used for                                                                                   |
+| ---------- | ---------- | ------------------------------------------------------------------------------------------ |
+| Neo4j      | Graph      | Topology + relationships: Service → Dependency → DB, Deploy → Commit → Service             |
+| ClickHouse | Columnar   | High-volume metrics/features: p99, error rate, CPU/mem, traffic, derived anomaly features  |
+| Qdrant     | Vector     | Embeddings: git diffs/PRs, runbooks, incident summaries (semantic retrieval)               |
 | PostgreSQL | Relational | App state: incidents, trigger decisions, settings, user accounts (later), report artifacts |
 
 ## Ingestion (two versions)
@@ -63,20 +65,21 @@ Goal: event-driven ingestion with buffering/backpressure and real CDC.
 ### Default trigger (RED + change proximity)
 
 Open an incident candidate when:
+
 - 5xx error rate > 1% OR p99 latency > 2× baseline
 - AND it occurs within 15 minutes of a DeploymentEvent for the service
 
 ### Three-tier gating
 
-1) Tier 1: Sentinel (deterministic)
+1. Tier 1: Sentinel (deterministic)
    - Prometheus alert rules and/or ClickHouse aggregate queries
    - Output: TriggerCandidate
 
-2) Tier 2: Filter (cheap heuristics, no LLM)
+2. Tier 2: Filter (cheap heuristics, no LLM)
    - Checks: deploy correlation, persistence, traffic floor, known-flaky suppression, rate limits
    - Output: ApprovedIncident (or suppressed with reason)
 
-3) Tier 3: Investigator (LangGraph + LLM)
+3. Tier 3: Investigator (LangGraph + LLM)
    - Runs only for approved incidents
    - Produces: ranked hypotheses + narrative + remediation ideas + evidence references
 
@@ -207,12 +210,14 @@ sequenceDiagram
 ## Brain internals (modules)
 
 ### Collectors
+
 - `k8s_collector`: watches Deployments/ReplicaSets/Pods/Events
 - `prometheus_collector`: queries SLO/SLA metrics per service
 - `git_collector`: fetches commits/PR metadata (webhook-first, polling fallback)
 - `db_collector`: fetches DB stats (optional v0)
 
 ### Data model (conceptual)
+
 - `Service`: stable identity for a logical service (namespace + labels)
 - `DeploymentEvent`: rollout start/end, image tags, helm release, etc.
 - `Commit`: hash, repo, files touched, diff summary, PR link
@@ -221,7 +226,9 @@ sequenceDiagram
 - `RCAReport`: hypotheses ranked, confidence, narrative, suggested actions
 
 ### Storage options (choose based on simplicity)
+
 For this project we standardize on the following stores:
+
 - **PostgreSQL**: incidents, evidence pointers, settings, rules, multi-tenant state
 - **ClickHouse**: metric events + aggregates + anomaly features (high volume)
 - **Qdrant**: embeddings for diffs/PRs/runbooks/incidents
@@ -263,5 +270,6 @@ For this project we standardize on the following stores:
 5. **LLM strategy**: pluggable providers + caching + strict grounding
 
 See also:
+
 - Data models: [DATA_MODELS.md](../data_structure/DATA_MODELS.md)
 - Identity mapping: [IDENTITY_MAPPING.md](../data_gathering/IDENTITY_MAPPING.md)
