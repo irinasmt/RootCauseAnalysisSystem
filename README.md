@@ -9,6 +9,21 @@ An open-source, Kubernetes-first Root Cause Analysis (RCA) system that:
 - Produces an evidence-backed “best explanation” of *what likely caused the incident* and *why*
 - Works with minimal prerequisites (start with metrics + deploy events + git), then optionally deepens accuracy with traces/logs later
 
+## Docs
+
+- Architecture overview: [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)
+- Brain (LangGraph engine): [docs/brain/BRAIN.md](docs/brain/BRAIN.md)
+- Edge cases (production readiness): [docs/production_readiness/EDGE_CASES.md](docs/production_readiness/EDGE_CASES.md)
+- Futuristic development (advanced moats): [docs/future_development/FUTURISTIC_DEVELOPMENT.md](docs/future_development/FUTURISTIC_DEVELOPMENT.md)
+- Implementation plan (phased): [docs/planning/IMPLEMENTATION_PLAN.md](docs/planning/IMPLEMENTATION_PLAN.md)
+- Setup (developer): [docs/setup/SETUP.md](docs/setup/SETUP.md)
+- Data models (schemas): [docs/data_structure/DATA_MODELS.md](docs/data_structure/DATA_MODELS.md)
+- Testing strategy: [docs/testing/TESTING.md](docs/testing/TESTING.md)
+- Identity mapping (service↔deploy↔commit): [docs/data_gathering/IDENTITY_MAPPING.md](docs/data_gathering/IDENTITY_MAPPING.md)
+- Human feedback loop: [docs/human_feedback/HUMAN_FEEDBACK.md](docs/human_feedback/HUMAN_FEEDBACK.md)
+- GitHub & development instructions: [.github/github_instructions.md](.github/github_instructions.md)
+- Spec-Driven Development (SDD): [specs/README.md](specs/README.md)
+
 ## Initial scope (v0)
 
 - Kubernetes only (single cluster)
@@ -33,17 +48,15 @@ Most observability tools can tell you *something is wrong*. This project aims to
 
 ## High-level approach
 
-1. **Ingest signals**: metrics, Kubernetes events, deployment metadata, git commits
-2. **Detect anomalies**: identify statistically significant shifts vs baseline
-3. **Build context**: time window + impacted services + dependency hints
-4. **Correlate causes**: match anomalies to deployments/commits and rank hypotheses
-5. **Generate report**: summarize likely root cause with confidence + supporting evidence
+1. Ingest signals (K8s + metrics + git + optional DB)
+2. Detect anomalies (cheap always-on)
+3. Trigger a bounded investigation (only on incidents)
+4. Correlate deploys/commits/config to the anomaly window
+5. Generate an evidence-backed RCA report for humans
 
 ## Roadmap
 
-- v0: Metrics + K8s events + Git correlation, basic report output
-- v1: Add service topology model (graph) and semantic search over diffs
-- v2: Optional logs/traces ingestion for deeper precision and fewer false positives
+See docs/architecture/ARCHITECTURE.md for the current phased plan.
 
 ## Contributing
 
