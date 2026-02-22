@@ -48,12 +48,6 @@ Recommended feature flow:
 
 Active feature artifacts live in numbered folders under `specs/` (for example `specs/001-build-realistic-mock/`).
 
-## Active feature (current)
-
-- Feature spec: [specs/001-build-realistic-mock/spec.md](specs/001-build-realistic-mock/spec.md)
-- Implementation plan: [specs/001-build-realistic-mock/plan.md](specs/001-build-realistic-mock/plan.md)
-- Task list: [specs/001-build-realistic-mock/tasks.md](specs/001-build-realistic-mock/tasks.md)
-
 ## Docs (start here)
 
 - Architecture overview: [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)
