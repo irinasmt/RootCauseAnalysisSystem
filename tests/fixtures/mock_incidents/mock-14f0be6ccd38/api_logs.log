@@ -1,0 +1,30 @@
+2026-02-22T10:00:00+00:00 level=INFO stream=api route=/orders status=200 latency_ms=127 correlation_id=corr-db_con-6711
+2026-02-22T10:01:00+00:00 level=INFO stream=api route=/orders status=200 latency_ms=131 correlation_id=corr-db_con-2851
+2026-02-22T10:02:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=121 correlation_id=corr-db_con-3219
+2026-02-22T10:03:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=120 correlation_id=corr-db_con-9044
+2026-02-22T10:04:00+00:00 level=INFO stream=api route=/orders status=200 latency_ms=138 correlation_id=corr-db_con-1587
+2026-02-22T10:05:00+00:00 level=INFO stream=api route=/orders status=200 latency_ms=135 correlation_id=corr-db_con-3098
+2026-02-22T10:06:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=129 correlation_id=corr-db_con-1748
+2026-02-22T10:07:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=139 correlation_id=corr-db_con-3026
+2026-02-22T10:08:00+00:00 level=INFO stream=api route=/orders status=200 latency_ms=140 correlation_id=corr-db_con-7062
+2026-02-22T10:09:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=132 correlation_id=corr-db_con-2567
+2026-02-22T10:10:00+00:00 level=INFO stream=api route=/orders status=200 latency_ms=137 correlation_id=corr-db_con-3239
+2026-02-22T10:11:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=123 correlation_id=corr-db_con-6938
+2026-02-22T10:12:00+00:00 level=INFO stream=api route=/orders status=200 latency_ms=122 correlation_id=corr-db_con-3444
+2026-02-22T10:13:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=132 correlation_id=corr-db_con-8818
+2026-02-22T10:14:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=139 correlation_id=corr-db_con-8162
+2026-02-22T10:15:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=976 error=db_pool_exhausted correlation_id=corr-db_con-9259
+2026-02-22T10:16:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=924 error=db_pool_exhausted correlation_id=corr-db_con-2294
+2026-02-22T10:17:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=992 error=db_pool_exhausted correlation_id=corr-db_con-5094
+2026-02-22T10:18:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=885 error=db_pool_exhausted correlation_id=corr-db_con-2824
+2026-02-22T10:19:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=931 error=db_pool_exhausted correlation_id=corr-db_con-7529
+2026-02-22T10:20:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=1148 error=db_pool_exhausted correlation_id=corr-db_con-8675
+2026-02-22T10:21:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=1220 error=db_pool_exhausted correlation_id=corr-db_con-7119
+2026-02-22T10:22:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=1241 error=db_pool_exhausted correlation_id=corr-db_con-3436
+2026-02-22T10:23:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=957 error=db_pool_exhausted correlation_id=corr-db_con-5407
+2026-02-22T10:24:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=1075 error=db_pool_exhausted correlation_id=corr-db_con-1711
+2026-02-22T10:25:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=1142 error=db_pool_exhausted correlation_id=corr-db_con-8704
+2026-02-22T10:26:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=999 error=db_pool_exhausted correlation_id=corr-db_con-6687
+2026-02-22T10:27:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=1058 error=db_pool_exhausted correlation_id=corr-db_con-8386
+2026-02-22T10:28:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=1140 error=db_pool_exhausted correlation_id=corr-db_con-1806
+2026-02-22T10:29:00+00:00 level=ERROR stream=api route=/orders status=503 latency_ms=1009 error=db_pool_exhausted correlation_id=corr-db_con-4517

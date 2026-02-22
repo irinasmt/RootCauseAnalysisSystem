@@ -19,10 +19,10 @@ description: "Task list for realistic mock incident data generation"
 
 **Purpose**: Prepare project structure and baseline module scaffolding.
 
-- [ ] T001 Create generator module scaffold in `rca/seed/mock_incident_generator.py`
-- [ ] T002 Add evaluation-readiness notes and future hook placeholders in `specs/001-build-realistic-mock/quickstart.md`
-- [ ] T003 [P] Create fixtures root folder and README in `tests/fixtures/mock_incidents/README.md`
-- [ ] T004 [P] Create shared test utilities for fixture pathing and file hashing in `tests/unit/test_mock_fixture_utils.py`
+- [x] T001 Create generator module scaffold in `rca/seed/mock_incident_generator.py`
+- [x] T002 Add evaluation-readiness notes and future hook placeholders in `specs/001-build-realistic-mock/quickstart.md`
+- [x] T003 [P] Create fixtures root folder and README in `tests/fixtures/mock_incidents/README.md`
+- [x] T004 [P] Create shared test utilities for fixture pathing and file hashing in `tests/unit/test_mock_fixture_utils.py`
 
 ---
 
@@ -32,13 +32,13 @@ description: "Task list for realistic mock incident data generation"
 
 **⚠️ CRITICAL**: User story tasks start only after this phase is complete.
 
-- [ ] T005 Define Pydantic models for `ScenarioDefinition`, `IncidentBundle`, `StreamArtifact`, `ExpectedOutputLabelSet` in `rca/seed/mock_incident_generator.py`
-- [ ] T006 Implement fixed v0 scenario registry (`normal_load`, `db_connection_pool_exhaustion`, `slow_query_regression`, `bad_api_rollout`, `pod_oom_restart_loop`) in `rca/seed/mock_incident_generator.py`
-- [ ] T007 Implement output path + bundle_id generation and artifact manifest assembly in `rca/seed/mock_incident_generator.py`
-- [ ] T008 Implement stream format policy guardrails (TXT for `ui/api/db/k8s`, JSONL for `mesh`) in `rca/seed/mock_incident_generator.py`
-- [ ] T009 Implement deterministic seed/time-anchor control and metadata timestamp handling in `rca/seed/mock_incident_generator.py`
-- [ ] T010 [P] Add foundational schema validation tests in `tests/unit/test_mock_incident_generator.py`
-- [ ] T011 [P] Add foundational contract invariants tests in `tests/unit/test_mock_incident_generator.py`
+- [x] T005 Define Pydantic models for `ScenarioDefinition`, `IncidentBundle`, `StreamArtifact`, `ExpectedOutputLabelSet` in `rca/seed/mock_incident_generator.py`
+- [x] T006 Implement fixed v0 scenario registry (`normal_load`, `db_connection_pool_exhaustion`, `slow_query_regression`, `bad_api_rollout`, `pod_oom_restart_loop`) in `rca/seed/mock_incident_generator.py`
+- [x] T007 Implement output path + bundle_id generation and artifact manifest assembly in `rca/seed/mock_incident_generator.py`
+- [x] T008 Implement stream format policy guardrails (TXT for `ui/api/db/k8s`, JSONL for `mesh`) in `rca/seed/mock_incident_generator.py`
+- [x] T009 Implement deterministic seed/time-anchor control and metadata timestamp handling in `rca/seed/mock_incident_generator.py`
+- [x] T010 [P] Add foundational schema validation tests in `tests/unit/test_mock_incident_generator.py`
+- [x] T011 [P] Add foundational contract invariants tests in `tests/unit/test_mock_incident_generator.py`
 
 **Checkpoint**: Foundational schema, scenario registry, and format policy are in place.
 
@@ -52,19 +52,19 @@ description: "Task list for realistic mock incident data generation"
 
 ### Tests for User Story 1
 
-- [ ] T012 [P] [US1] Add unit test for complete artifact set generation in `tests/unit/test_mock_incident_generator.py`
-- [ ] T013 [P] [US1] Add unit test that enforces one `ground_truth.json` per bundle in `tests/unit/test_mock_incident_generator.py`
+- [x] T012 [P] [US1] Add unit test for complete artifact set generation in `tests/unit/test_mock_incident_generator.py`
+- [x] T013 [P] [US1] Add unit test that enforces one `ground_truth.json` per bundle in `tests/unit/test_mock_incident_generator.py`
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Implement stream record generation for `ui_events.log` in `rca/seed/mock_incident_generator.py`
-- [ ] T015 [US1] Implement stream record generation for `api_logs.log` in `rca/seed/mock_incident_generator.py`
-- [ ] T016 [US1] Implement stream record generation for `db_events.log` in `rca/seed/mock_incident_generator.py`
-- [ ] T017 [US1] Implement stream record generation for `k8s_events.log` in `rca/seed/mock_incident_generator.py`
-- [ ] T018 [US1] Implement stream record generation for `mesh_events.jsonl` in `rca/seed/mock_incident_generator.py`
-- [ ] T019 [US1] Implement `manifest.json` writing in `rca/seed/mock_incident_generator.py`
-- [ ] T020 [US1] Implement `ground_truth.json` writing in `rca/seed/mock_incident_generator.py`
-- [ ] T021 [US1] Implement public generate entrypoint for one scenario bundle in `rca/seed/mock_incident_generator.py`
+- [x] T014 [US1] Implement stream record generation for `ui_events.log` in `rca/seed/mock_incident_generator.py`
+- [x] T015 [US1] Implement stream record generation for `api_logs.log` in `rca/seed/mock_incident_generator.py`
+- [x] T016 [US1] Implement stream record generation for `db_events.log` in `rca/seed/mock_incident_generator.py`
+- [x] T017 [US1] Implement stream record generation for `k8s_events.log` in `rca/seed/mock_incident_generator.py`
+- [x] T018 [US1] Implement stream record generation for `mesh_events.jsonl` in `rca/seed/mock_incident_generator.py`
+- [x] T019 [US1] Implement `manifest.json` writing in `rca/seed/mock_incident_generator.py`
+- [x] T020 [US1] Implement `ground_truth.json` writing in `rca/seed/mock_incident_generator.py`
+- [x] T021 [US1] Implement public generate entrypoint for one scenario bundle in `rca/seed/mock_incident_generator.py`
 
 **Checkpoint**: P1 bundle generation works end-to-end for a single scenario.
 
@@ -78,9 +78,9 @@ description: "Task list for realistic mock incident data generation"
 
 ### Implementation for User Story 2 (Current Scope)
 
-- [ ] T022 [P] [US2] Add metadata validation test for `ground_truth.json` required fields in `tests/unit/test_mock_incident_generator.py`
-- [ ] T023 [P] [US2] Add threshold policy validation test (configurable, default `0.70`) in `tests/unit/test_mock_incident_generator.py`
-- [ ] T024 [US2] Document deferred Brain runtime integration contract in `specs/001-build-realistic-mock/contracts/mock-incident-generator-contract.md`
+- [x] T022 [P] [US2] Add metadata validation test for `ground_truth.json` required fields in `tests/unit/test_mock_incident_generator.py`
+- [x] T023 [P] [US2] Add threshold policy validation test (configurable, default `0.70`) in `tests/unit/test_mock_incident_generator.py`
+- [x] T024 [US2] Document deferred Brain runtime integration contract in `specs/001-build-realistic-mock/contracts/mock-incident-generator-contract.md`
 
 **Checkpoint**: Evaluation metadata contracts are stable; Brain scoring implementation is deferred.
 
@@ -94,15 +94,15 @@ description: "Task list for realistic mock incident data generation"
 
 ### Tests for User Story 3
 
-- [ ] T025 [P] [US3] Add scenario coverage test for exact five-scenario set in `tests/integration/test_mock_bundle_determinism.py`
-- [ ] T026 [P] [US3] Add integration test for deterministic artifact byte equality across reruns in `tests/integration/test_mock_bundle_determinism.py`
-- [ ] T027 [P] [US3] Add integration test for allowed metadata timestamp variance only in `tests/integration/test_mock_bundle_determinism.py`
+- [x] T025 [P] [US3] Add scenario coverage test for exact five-scenario set in `tests/integration/test_mock_bundle_determinism.py`
+- [x] T026 [P] [US3] Add integration test for deterministic artifact byte equality across reruns in `tests/integration/test_mock_bundle_determinism.py`
+- [x] T027 [P] [US3] Add integration test for allowed metadata timestamp variance only in `tests/integration/test_mock_bundle_determinism.py`
 
 ### Implementation for User Story 3
 
-- [ ] T028 [US3] Implement scenario sweep generation helper in `rca/seed/mock_incident_generator.py`
-- [ ] T029 [US3] Implement deterministic rerun comparison helper (stream checksum + metadata exception list) in `rca/seed/mock_incident_generator.py`
-- [ ] T030 [US3] Add fixture generation command examples to `specs/001-build-realistic-mock/quickstart.md`
+- [x] T028 [US3] Implement scenario sweep generation helper in `rca/seed/mock_incident_generator.py`
+- [x] T029 [US3] Implement deterministic rerun comparison helper (stream checksum + metadata exception list) in `rca/seed/mock_incident_generator.py`
+- [x] T030 [US3] Add fixture generation command examples to `specs/001-build-realistic-mock/quickstart.md`
 
 **Checkpoint**: All five scenarios are generated and deterministic checks pass.
 
@@ -110,10 +110,10 @@ description: "Task list for realistic mock incident data generation"
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T031 [P] Add contract-alignment assertions for output paths/naming in `tests/unit/test_mock_incident_generator.py`
-- [ ] T032 [P] Add edge-case tests (clock skew, partial outage, retry storms, mesh policy change) in `tests/integration/test_mock_bundle_determinism.py`
-- [ ] T033 Run full targeted test suite and capture expected commands in `specs/001-build-realistic-mock/quickstart.md`
-- [ ] T034 Update feature docs with final implementation notes in `specs/001-build-realistic-mock/plan.md`
+- [x] T031 [P] Add contract-alignment assertions for output paths/naming in `tests/unit/test_mock_incident_generator.py`
+- [x] T032 [P] Add edge-case tests (clock skew, partial outage, retry storms, mesh policy change) in `tests/integration/test_mock_bundle_determinism.py`
+- [x] T033 Run full targeted test suite and capture expected commands in `specs/001-build-realistic-mock/quickstart.md`
+- [x] T034 Update feature docs with final implementation notes in `specs/001-build-realistic-mock/plan.md`
 
 ---
 

@@ -69,3 +69,9 @@ Contract for generating deterministic incident bundles and evaluation-ready meta
 - `INVALID_PARAMETER`
 - `INVALID_OUTPUT_FORMAT`
 - `GENERATION_FAILED`
+
+## Deferred runtime integration hooks
+
+- `ground_truth.json` is the canonical expected-output contract for future Brain scoring.
+- v0 does not execute Brain inference or pass/fail runtime evaluation.
+- Future Brain integration MUST consume generated bundles without changing this contract schema.

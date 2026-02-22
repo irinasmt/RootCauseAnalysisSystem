@@ -2,7 +2,7 @@
 
 ## Goal
 
-Generate deterministic v0 mock incident bundles and validate RCA evaluation behavior.
+Generate deterministic v0 mock incident bundles and validate evaluation-readiness contracts.
 
 ## Prerequisites
 
@@ -12,11 +12,10 @@ Generate deterministic v0 mock incident bundles and validate RCA evaluation beha
 
 ## 1) Generate one bundle
 
-Example invocation (placeholder command path):
+Example invocation:
 
 ```powershell
-# Use the project generator entrypoint once implemented
-# python -m rca.seed.mock_incident_generator --scenario db_connection_pool_exhaustion --seed 42 --time-anchor 2026-02-22T10:00:00Z
+python -c "from rca.seed.mock_incident_generator import generate; generate(scenario='db_connection_pool_exhaustion', seed=42, time_anchor='2026-02-22T10:00:00Z')"
 ```
 
 Expected output directory:
@@ -44,12 +43,25 @@ Pass criteria:
 
 ## 3) Run RCA evaluation
 
-Evaluate Brain output against `ground_truth.json`.
+Runtime Brain scoring is deferred for this feature iteration.
+
+Current v0 requirement is evaluation-readiness only:
+
+- `ground_truth.json` exists for every bundle.
+- Required label fields and threshold policy are present.
+- Future Brain integration can consume this contract without schema changes.
+
+Future hook placeholder:
+
+```text
+# Future integration point (not implemented in v0):
+# brain.evaluate(bundle_path="tests/fixtures/mock_incidents/<bundle_id>")
+```
 
 Pass criteria:
 
-- Evaluation uses configurable threshold with default `0.70`.
-- Result clearly reports `pass`/`fail` and comparison rationale.
+- Metadata includes configurable threshold with default `0.70`.
+- Bundle contract validates without Brain runtime dependencies.
 
 ## 4) Validate v0 scenario coverage
 
@@ -65,3 +77,21 @@ Pass criteria:
 
 - All five bundles generated successfully.
 - Each bundle satisfies artifact contract and expected-output presence.
+
+## 5) Generate all scenarios (sweep)
+
+```powershell
+python -c "from rca.seed.mock_incident_generator import generate_all_scenarios; generate_all_scenarios(seed=42, time_anchor='2026-02-22T10:00:00Z')"
+```
+
+## 6) Run targeted tests
+
+```powershell
+pytest tests/unit/test_mock_fixture_utils.py tests/unit/test_mock_incident_generator.py tests/integration/test_mock_bundle_determinism.py
+```
+
+Optional full feature suite:
+
+```powershell
+pytest tests/unit tests/integration -k mock
+```

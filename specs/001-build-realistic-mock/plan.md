@@ -87,3 +87,12 @@ specs/
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 | --------- | ---------- | ------------------------------------ |
 | None      | N/A        | N/A                                  |
+
+## Final Implementation Notes
+
+- Implemented generator module: `rca/seed/mock_incident_generator.py`
+- Implemented fixed five-scenario v0 registry and deterministic stream generation
+- Enforced output format policy: TXT for `ui/api/db/k8s`, JSONL for `mesh`
+- Added manifest + ground-truth artifact writing with threshold default `0.70`
+- Added unit and integration tests for schema, contract invariants, scenario coverage, and determinism checks
+- Brain runtime evaluation remains intentionally deferred; only evaluation-readiness metadata is implemented in this feature
