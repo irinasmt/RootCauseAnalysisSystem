@@ -2,6 +2,25 @@
 
 This document describes the **Brain**: the customer-installed RCA engine that runs the investigation only when a trigger fires.
 
+## MVP execution example
+
+```python
+from datetime import datetime, timezone
+
+from rca.brain import ApprovedIncident, BrainEngine
+
+incident = ApprovedIncident(
+    incident_id="inc-123",
+    service="checkout-api",
+    started_at=datetime(2026, 2, 22, tzinfo=timezone.utc),
+    deployment_id="deploy-42",
+)
+
+engine = BrainEngine()
+report = engine.run(incident)
+print(report.status, report.critic_score)
+```
+
 The Brain is designed to avoid the “commodity trap” by being **self-correcting**: every hypothesis must survive cross-validation before a human sees it.
 
 ## Design principles
@@ -118,59 +137,14 @@ If not, the hypothesis is downgraded or rejected.
 ## Exit ramps (save time + money)
 
 - **Empty Search Exit**: no deployments found within the last hour
-  - outcome: stop code-correlation path
-  - message: “No recent changes detected; investigating infra-only causes.”
-
-- **Iteration Limit Exit**: hit `max_iterations`
-  - outcome: human escalation with structured evidence bundle
-  - message: “Conflicting evidence; unable to resolve automatically.”
-
-- **Low traffic exit** (optional): if request rate is below a minimum threshold
-  - outcome: avoid interpreting noise as incident
+- **Data Gap Exit**: required metrics missing or stale
+- **Low Impact Exit**: confidence remains below threshold after max iterations
 
 ---
 
-## Inputs and outputs (contracts)
+## Outputs
 
-### Brain input (from Trigger system)
-
-`ApprovedIncident` should minimally include:
-
-- `service_id`
-- `trigger_type` (e.g., `error_rate_spike`, `p99_regression`, `crashloop`)
-- `started_at`, `window_start`, `window_end`
-- `severity`
-- `deployment_event_ids` (if known)
-
-### Brain output
-
-- `incident_hypotheses` (ranked list with confidence)
-- `rca_report` (human-readable summary)
-- `evidence_refs` (pointers into ClickHouse / Neo4j / Qdrant)
-- `next_actions` (rollback, revert, scale, add index, etc.)
-
-Persisted to PostgreSQL for UI consumption.
-
----
-
-Store responsibilities are defined in ../architecture/ARCHITECTURE.md.
-
----
-
-## Implementation notes (practical MVP)
-
-- Start with a single LangGraph graph for the three main scenarios:
-  1. Bad code push (5xx spike)
-  2. Silent slowdown (p99 regression)
-  3. Config drift (CrashLoopBackOff)
-
-- Keep workers deterministic where possible:
-  - Git_Scout: mostly API calls + diff summarization
-  - Metric_Analyst: mostly ClickHouse queries
-
-- Use the LLM primarily for:
-  - synthesizing a narrative
-  - ranking ambiguous hypotheses
-  - generating “next steps” suggestions
-
-- Always store intermediate artifacts so humans can audit the reasoning.
+- Ranked hypotheses with confidence and linked evidence
+- Action recommendation (`deploy rollback`, `capacity increase`, `DB rollback`, etc.)
+- Machine-readable RCA report + human-readable summary
+- Escalation package when unresolved
