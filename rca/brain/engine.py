@@ -59,7 +59,6 @@ class BrainEngine:
                 metadata={
                     "iteration": state.iteration,
                     "max_iterations": state.max_iterations,
-                    "critic_reasoning": state.critic_reasoning,
                     "llm_enabled": self._llm is not None,
                 },
             )

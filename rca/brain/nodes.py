@@ -21,12 +21,15 @@ def supervisor(state: BrainState, llm: LLMClient | None = None) -> BrainState:
             evidence_block = "\n\nAdditional evidence from the incident bundle:\n" + "\n".join(
                 f"  [{k}]\n{v}" for k, v in extra.items()
             )
+        refinement_block = ""
+        if state.iteration > 1 and state.critic_reasoning:
+            refinement_block = f"\n\nA critic flagged these gaps in the previous investigation:\n{state.critic_reasoning}\nFocus on gathering stronger evidence for the existing theory rather than pivoting to a new one, unless the critic has explicitly ruled it out."
         prompt = f"""You are a senior SRE analyst. An incident has been reported.
 
 Incident details:
 - Service: {state.incident.service}
 - Started at: {state.incident.started_at.isoformat()}
-- Linked deployment: {state.incident.deployment_id or "none"}{evidence_block}
+- Linked deployment: {state.incident.deployment_id or "none"}{evidence_block}{refinement_block}
 
 In 2-3 sentences, write a focused investigation plan: what evidence to gather and which failure modes to explore first.
 Do not speculate beyond the facts given. Be concise and actionable."""
@@ -132,6 +135,9 @@ def rca_synthesizer(state: BrainState, llm: LLMClient | None = None) -> BrainSta
             raw_logs_block = "\n\nRaw log evidence:\n" + "\n".join(
                 f"  [{k}]\n{v}" for k, v in extra.items()
             )
+        critique_block = ""
+        if state.iteration > 1 and state.critic_reasoning:
+            critique_block = f"\n\nA critic reviewed the previous hypotheses and noted these gaps in the evidence:\n{state.critic_reasoning}\nKeep the same hypotheses if they are still the best fit. Strengthen them by citing more specific evidence from the logs and metrics. Do NOT invent new root causes unless the evidence clearly rules out the existing ones."
         prompt = f"""You are an SRE root-cause analyst. Generate root-cause hypotheses for this incident.
 
 Service: {state.incident.service}
@@ -140,7 +146,7 @@ Deployment: {state.incident.deployment_id or "none"}
 Investigation plan: {state.task_plan}
 Git context: {state.git_summary}
 Metrics context: {state.metrics_summary}
-Evidence refs: {", ".join(state.evidence_refs)}{raw_logs_block}
+Evidence refs: {", ".join(state.evidence_refs)}{raw_logs_block}{critique_block}
 
 Return ONLY a valid JSON object — no markdown, no extra text:
 {{

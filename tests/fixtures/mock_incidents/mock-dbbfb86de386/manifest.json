@@ -1,0 +1,47 @@
+{
+  "artifacts": [
+    {
+      "checksum": "fd127552d817c1e5ecc2b4a5d43aae6fda5b5ec64da647854daab56a8e79e3c7",
+      "file_name": "ui_events.log",
+      "format": "txt",
+      "record_count": 30,
+      "stream_name": "ui"
+    },
+    {
+      "checksum": "60adee548f811601ea5e3384257b38c8d8e2b74a795bfcb7650aa656c340f878",
+      "file_name": "api_logs.log",
+      "format": "txt",
+      "record_count": 30,
+      "stream_name": "api"
+    },
+    {
+      "checksum": "57d3cfc656bc5a9d4da8927588d6980bf3511fb63a38bb28fb100eb0ebcc41de",
+      "file_name": "db_events.log",
+      "format": "txt",
+      "record_count": 30,
+      "stream_name": "db"
+    },
+    {
+      "checksum": "9d02a75d2f63ab45694f3801c51820ce35674050141fa15e7e6c55be3e6dea41",
+      "file_name": "k8s_events.log",
+      "format": "txt",
+      "record_count": 30,
+      "stream_name": "k8s"
+    },
+    {
+      "checksum": "49032fc4f3738ce59f66c2e821d6464489795b908e00f0b9734f1fac698f20a7",
+      "file_name": "mesh_events.jsonl",
+      "format": "jsonl",
+      "record_count": 30,
+      "stream_name": "mesh"
+    }
+  ],
+  "bundle_id": "mock-dbbfb86de386",
+  "created_at": "2026-02-23T10:56:42+00:00",
+  "duration_minutes": 30,
+  "resolution_seconds": 60,
+  "scenario": "bad_api_rollout",
+  "seed": 42,
+  "threshold": 0.7,
+  "time_anchor": "2026-02-23T09:00:00+00:00"
+}

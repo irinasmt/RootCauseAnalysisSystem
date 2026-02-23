@@ -1,0 +1,47 @@
+{
+  "artifacts": [
+    {
+      "checksum": "9ad86ac7f1d958634cdab8d01551bb0b2e262fb8da1adf5fd9de106e7fab92f2",
+      "file_name": "ui_events.log",
+      "format": "txt",
+      "record_count": 30,
+      "stream_name": "ui"
+    },
+    {
+      "checksum": "b8c392f88e960f93a8f31facd62bd911cfdc039a1271f3d2fc26cafbf47ac087",
+      "file_name": "api_logs.log",
+      "format": "txt",
+      "record_count": 30,
+      "stream_name": "api"
+    },
+    {
+      "checksum": "f2db2e0726cd9e83d4839604c28777ba1c1feb95e314b9066412d3015aa2b8ff",
+      "file_name": "db_events.log",
+      "format": "txt",
+      "record_count": 30,
+      "stream_name": "db"
+    },
+    {
+      "checksum": "6cdfbe409a9b5ab8ee8a8bb45502d5510c7ecd77d8ab0ab10d253495599bcac2",
+      "file_name": "k8s_events.log",
+      "format": "txt",
+      "record_count": 30,
+      "stream_name": "k8s"
+    },
+    {
+      "checksum": "d688c2d6e4fa3901fa07fa4a2c4b3a611d2354eb1a73e654425e6f02035d4372",
+      "file_name": "mesh_events.jsonl",
+      "format": "jsonl",
+      "record_count": 30,
+      "stream_name": "mesh"
+    }
+  ],
+  "bundle_id": "mock-46f7c3f82758",
+  "created_at": "2026-02-23T10:39:14+00:00",
+  "duration_minutes": 30,
+  "resolution_seconds": 60,
+  "scenario": "slow_query_regression",
+  "seed": 42,
+  "threshold": 0.7,
+  "time_anchor": "2026-02-23T09:00:00+00:00"
+}

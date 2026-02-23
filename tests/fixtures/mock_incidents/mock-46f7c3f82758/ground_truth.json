@@ -1,0 +1,12 @@
+{
+  "blast_radius": "api_and_db",
+  "bundle_id": "mock-46f7c3f82758",
+  "confidence_target_max": 0.95,
+  "confidence_target_min": 0.7,
+  "expected_first_signal": "db_latency",
+  "root_cause": "missing_index",
+  "scenario_id": "slow_query_regression",
+  "threshold_default": 0.7,
+  "threshold_override": null,
+  "trigger": "query_plan_change"
+}

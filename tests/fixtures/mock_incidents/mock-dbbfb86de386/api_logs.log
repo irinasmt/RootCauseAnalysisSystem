@@ -1,0 +1,30 @@
+2026-02-23T09:00:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=136 correlation_id=corr-bad_ap-5915
+2026-02-23T09:01:00+00:00 level=INFO stream=api route=/orders status=200 latency_ms=139 correlation_id=corr-bad_ap-8312
+2026-02-23T09:02:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=137 correlation_id=corr-bad_ap-5799
+2026-02-23T09:03:00+00:00 level=INFO stream=api route=/orders status=200 latency_ms=122 correlation_id=corr-bad_ap-5286
+2026-02-23T09:04:00+00:00 level=INFO stream=api route=/orders status=200 latency_ms=132 correlation_id=corr-bad_ap-3088
+2026-02-23T09:05:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=134 correlation_id=corr-bad_ap-2134
+2026-02-23T09:06:00+00:00 level=INFO stream=api route=/orders status=200 latency_ms=131 correlation_id=corr-bad_ap-1866
+2026-02-23T09:07:00+00:00 level=INFO stream=api route=/orders status=200 latency_ms=139 correlation_id=corr-bad_ap-7916
+2026-02-23T09:08:00+00:00 level=INFO stream=api route=/orders status=200 latency_ms=130 correlation_id=corr-bad_ap-1415
+2026-02-23T09:09:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=127 correlation_id=corr-bad_ap-4390
+2026-02-23T09:10:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=133 correlation_id=corr-bad_ap-8298
+2026-02-23T09:11:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=125 correlation_id=corr-bad_ap-2471
+2026-02-23T09:12:00+00:00 level=INFO stream=api route=/orders status=200 latency_ms=132 correlation_id=corr-bad_ap-1389
+2026-02-23T09:13:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=135 correlation_id=corr-bad_ap-4909
+2026-02-23T09:14:00+00:00 level=INFO stream=api route=/orders status=201 latency_ms=120 correlation_id=corr-bad_ap-3351
+2026-02-23T09:15:00+00:00 level=ERROR stream=api route=/orders status=501 latency_ms=271 error=unhandled_null_path correlation_id=corr-bad_ap-4434
+2026-02-23T09:16:00+00:00 level=ERROR stream=api route=/orders status=500 latency_ms=242 error=unhandled_null_path correlation_id=corr-bad_ap-9432
+2026-02-23T09:17:00+00:00 level=ERROR stream=api route=/orders status=500 latency_ms=327 error=unhandled_null_path correlation_id=corr-bad_ap-8356
+2026-02-23T09:18:00+00:00 level=ERROR stream=api route=/orders status=500 latency_ms=248 error=unhandled_null_path correlation_id=corr-bad_ap-8023
+2026-02-23T09:19:00+00:00 level=ERROR stream=api route=/orders status=500 latency_ms=220 error=unhandled_null_path correlation_id=corr-bad_ap-2891
+2026-02-23T09:20:00+00:00 level=ERROR stream=api route=/orders status=502 latency_ms=403 error=unhandled_null_path correlation_id=corr-bad_ap-5353
+2026-02-23T09:21:00+00:00 level=ERROR stream=api route=/orders status=502 latency_ms=315 error=unhandled_null_path correlation_id=corr-bad_ap-9272
+2026-02-23T09:22:00+00:00 level=ERROR stream=api route=/orders status=500 latency_ms=372 error=unhandled_null_path correlation_id=corr-bad_ap-6369
+2026-02-23T09:23:00+00:00 level=ERROR stream=api route=/orders status=501 latency_ms=312 error=unhandled_null_path correlation_id=corr-bad_ap-1705
+2026-02-23T09:24:00+00:00 level=ERROR stream=api route=/orders status=500 latency_ms=294 error=unhandled_null_path correlation_id=corr-bad_ap-2201
+2026-02-23T09:25:00+00:00 level=ERROR stream=api route=/orders status=502 latency_ms=299 error=unhandled_null_path correlation_id=corr-bad_ap-9907
+2026-02-23T09:26:00+00:00 level=ERROR stream=api route=/orders status=500 latency_ms=358 error=unhandled_null_path correlation_id=corr-bad_ap-6557
+2026-02-23T09:27:00+00:00 level=ERROR stream=api route=/orders status=501 latency_ms=251 error=unhandled_null_path correlation_id=corr-bad_ap-6534
+2026-02-23T09:28:00+00:00 level=ERROR stream=api route=/orders status=502 latency_ms=228 error=unhandled_null_path correlation_id=corr-bad_ap-8623
+2026-02-23T09:29:00+00:00 level=ERROR stream=api route=/orders status=502 latency_ms=257 error=unhandled_null_path correlation_id=corr-bad_ap-1950

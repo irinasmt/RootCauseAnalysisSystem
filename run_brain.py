@@ -104,12 +104,6 @@ def print_report(report) -> None:
             print(f"      Evidence: {', '.join(h.evidence_refs)}")
             print()
 
-    if report.metadata.get("critic_reasoning"):
-        print("  CRITIC REASONING\n")
-        for line in textwrap.wrap(report.metadata["critic_reasoning"], width=66):
-            print(f"  {line}")
-        print()
-
     if report.errors:
         print(f"\n  ERRORS: {report.errors}")
 
