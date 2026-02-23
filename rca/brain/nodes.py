@@ -2,7 +2,15 @@
 
 from __future__ import annotations
 
-from .models import BrainState, Hypothesis
+from .models import (
+    BrainState,
+    CriticOutput,
+    GitScoutOutput,
+    Hypothesis,
+    MetricAnalystOutput,
+    SupervisorOutput,
+    SynthesizerOutput,
+)
 from .llm import LLMClient
 
 
@@ -45,6 +53,8 @@ Do not speculate beyond the facts given. Be concise and actionable."""
             )
         )
 
+    # Validate supervisor output before passing to next node
+    SupervisorOutput(task_plan=state.task_plan, evidence_refs=state.evidence_refs)
     return state
 
 
@@ -81,6 +91,8 @@ If no deployment ID is present, state that the incident is likely infrastructure
                 "Focus on infrastructure, traffic, and dependency signals."
             )
 
+    # Validate git_scout output before passing to next node
+    GitScoutOutput(git_summary=state.git_summary)
     return state
 
 
@@ -119,6 +131,8 @@ In 3-5 sentences, describe the likely metric anomaly pattern:
             "Check CPU and connection pool saturation."
         )
 
+    # Validate metric_analyst output before passing to next node
+    MetricAnalystOutput(metrics_summary=state.metrics_summary, evidence_refs=state.evidence_refs)
     return state
 
 
@@ -203,6 +217,8 @@ Confidence must be between 0.0 and 1.0. If no deployment exists, lower confidenc
             )
         ]
 
+    # Validate synthesizer output before passing to next node
+    SynthesizerOutput(hypotheses=state.hypotheses)
     return state
 
 
@@ -242,14 +258,18 @@ Score guide: 0.9+ = definitive, 0.8 = strong, 0.6-0.79 = plausible, <0.6 = weak 
         try:
             parsed = llm.generate_json(prompt)
             state.critic_score = max(0.0, min(1.0, float(parsed.get("score", 0.5))))
-            state.critic_reasoning = parsed.get("reasoning", "")
+            state.critic_reasoning = parsed.get("reasoning", "") or "LLM returned no reasoning."
         except Exception as exc:
             state.errors.append(f"critic_parse_error: {exc}")
             decay = max(0.0, 0.02 * (state.iteration - 1))
             state.critic_score = max(0.0, min(1.0, top.confidence - decay))
+            state.critic_reasoning = f"LLM critic failed ({exc}); stub score applied."
     else:
         # Deterministic stub
         decay = max(0.0, 0.02 * (state.iteration - 1))
         state.critic_score = max(0.0, min(1.0, top.confidence - decay))
+        state.critic_reasoning = f"Stub evaluation: top hypothesis confidence {top.confidence:.2f} with decay {decay:.2f}."
 
+    # Validate critic output — surfaces bad scores early
+    CriticOutput(critic_score=state.critic_score, critic_reasoning=state.critic_reasoning)
     return state

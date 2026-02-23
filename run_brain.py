@@ -53,13 +53,16 @@ def load_fixture(fixture_dir: Path) -> dict:
 
 def build_incident(fixture_dir: Path, fixture_data: dict) -> ApprovedIncident:
     gt = fixture_data.get("ground_truth", {})
+    manifest = fixture_data.get("manifest", {})
 
-    # Use ground_truth started_at if present, else derive from log timestamps
-    started_at_str = gt.get("started_at", "2026-02-22T10:15:00+00:00")
+    # Prefer ground_truth.started_at → manifest.time_anchor (the actual log start time)
+    started_at_str = gt.get("started_at") or manifest.get("time_anchor")
     try:
-        started_at = datetime.fromisoformat(started_at_str)
+        started_at = datetime.fromisoformat(started_at_str.replace("Z", "+00:00")) if started_at_str else None
     except (ValueError, TypeError):
-        started_at = datetime(2026, 2, 22, 10, 15, tzinfo=timezone.utc)
+        started_at = None
+    if started_at is None:
+        started_at = datetime.now(tz=timezone.utc).replace(microsecond=0)
 
     # Build extra_context: ground_truth summary + log snippets
     extra: dict[str, str] = {

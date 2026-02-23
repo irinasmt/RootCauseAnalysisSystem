@@ -48,3 +48,31 @@ class BrainState(BaseModel):
     git_summary: str = ""
     metrics_summary: str = ""
     critic_reasoning: str = ""
+
+
+# ---------------------------------------------------------------------------
+# Per-node output validators — each node validates its produced fields
+# through these models before passing state to the next node.
+# ---------------------------------------------------------------------------
+
+class SupervisorOutput(BaseModel):
+    task_plan: str = Field(min_length=1, description="Investigation plan must be non-empty")
+    evidence_refs: list[str] = Field(min_length=1, description="At least one evidence ref required")
+
+
+class GitScoutOutput(BaseModel):
+    git_summary: str = Field(min_length=1, description="Git/deployment context must be non-empty")
+
+
+class MetricAnalystOutput(BaseModel):
+    metrics_summary: str = Field(min_length=1, description="Metrics analysis must be non-empty")
+    evidence_refs: list[str] = Field(min_length=1, description="At least one evidence ref required")
+
+
+class SynthesizerOutput(BaseModel):
+    hypotheses: list[Hypothesis] = Field(min_length=1, description="At least one hypothesis required")
+
+
+class CriticOutput(BaseModel):
+    critic_score: float = Field(ge=0.0, le=1.0, description="Score must be between 0.0 and 1.0")
+    critic_reasoning: str = Field(min_length=1, description="Critic must provide reasoning")
