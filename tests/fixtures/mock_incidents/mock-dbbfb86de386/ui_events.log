@@ -1,0 +1,30 @@
+2026-02-23T09:00:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-9071
+2026-02-23T09:01:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-4657
+2026-02-23T09:02:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-3528
+2026-02-23T09:03:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-1079
+2026-02-23T09:04:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-8556
+2026-02-23T09:05:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-9536
+2026-02-23T09:06:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-9485
+2026-02-23T09:07:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-2685
+2026-02-23T09:08:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-2449
+2026-02-23T09:09:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-6750
+2026-02-23T09:10:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-4045
+2026-02-23T09:11:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-3396
+2026-02-23T09:12:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-9908
+2026-02-23T09:13:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-5692
+2026-02-23T09:14:00+00:00 level=INFO stream=ui event=user_action correlation_id=corr-bad_ap-2654
+2026-02-23T09:15:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-2462
+2026-02-23T09:16:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-8921
+2026-02-23T09:17:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-9593
+2026-02-23T09:18:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-4084
+2026-02-23T09:19:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-7502
+2026-02-23T09:20:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-3689
+2026-02-23T09:21:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-6637
+2026-02-23T09:22:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-2316
+2026-02-23T09:23:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-5183
+2026-02-23T09:24:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-8477
+2026-02-23T09:25:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-9902
+2026-02-23T09:26:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-3467
+2026-02-23T09:27:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-6271
+2026-02-23T09:28:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-6741
+2026-02-23T09:29:00+00:00 level=ERROR stream=ui event=error_banner_shown error=backend_failure correlation_id=corr-bad_ap-5341
