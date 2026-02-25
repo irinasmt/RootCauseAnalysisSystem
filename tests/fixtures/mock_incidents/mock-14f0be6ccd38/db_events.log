@@ -1,0 +1,30 @@
+2026-02-22T10:00:00+00:00 level=INFO stream=db query=SELECT latency_ms=23 correlation_id=corr-db_con-2211
+2026-02-22T10:01:00+00:00 level=INFO stream=db query=SELECT latency_ms=23 correlation_id=corr-db_con-8908
+2026-02-22T10:02:00+00:00 level=INFO stream=db query=SELECT latency_ms=24 correlation_id=corr-db_con-3578
+2026-02-22T10:03:00+00:00 level=INFO stream=db query=SELECT latency_ms=20 correlation_id=corr-db_con-4530
+2026-02-22T10:04:00+00:00 level=INFO stream=db query=SELECT latency_ms=22 correlation_id=corr-db_con-5814
+2026-02-22T10:05:00+00:00 level=INFO stream=db query=SELECT latency_ms=17 correlation_id=corr-db_con-3469
+2026-02-22T10:06:00+00:00 level=INFO stream=db query=SELECT latency_ms=21 correlation_id=corr-db_con-5129
+2026-02-22T10:07:00+00:00 level=INFO stream=db query=SELECT latency_ms=23 correlation_id=corr-db_con-5122
+2026-02-22T10:08:00+00:00 level=INFO stream=db query=SELECT latency_ms=17 correlation_id=corr-db_con-4583
+2026-02-22T10:09:00+00:00 level=INFO stream=db query=SELECT latency_ms=25 correlation_id=corr-db_con-5577
+2026-02-22T10:10:00+00:00 level=INFO stream=db query=SELECT latency_ms=19 correlation_id=corr-db_con-3344
+2026-02-22T10:11:00+00:00 level=INFO stream=db query=SELECT latency_ms=15 correlation_id=corr-db_con-8156
+2026-02-22T10:12:00+00:00 level=INFO stream=db query=SELECT latency_ms=23 correlation_id=corr-db_con-7231
+2026-02-22T10:13:00+00:00 level=INFO stream=db query=SELECT latency_ms=20 correlation_id=corr-db_con-3824
+2026-02-22T10:14:00+00:00 level=INFO stream=db query=SELECT latency_ms=20 correlation_id=corr-db_con-2910
+2026-02-22T10:15:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=1440 correlation_id=corr-db_con-8001
+2026-02-22T10:16:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=2207 correlation_id=corr-db_con-1034
+2026-02-22T10:17:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=1595 correlation_id=corr-db_con-3318
+2026-02-22T10:18:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=2022 correlation_id=corr-db_con-3373
+2026-02-22T10:19:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=1926 correlation_id=corr-db_con-6848
+2026-02-22T10:20:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=2101 correlation_id=corr-db_con-8176
+2026-02-22T10:21:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=2286 correlation_id=corr-db_con-7595
+2026-02-22T10:22:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=1309 correlation_id=corr-db_con-8490
+2026-02-22T10:23:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=1893 correlation_id=corr-db_con-7291
+2026-02-22T10:24:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=1462 correlation_id=corr-db_con-6108
+2026-02-22T10:25:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=1965 correlation_id=corr-db_con-2025
+2026-02-22T10:26:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=1738 correlation_id=corr-db_con-7730
+2026-02-22T10:27:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=1498 correlation_id=corr-db_con-2648
+2026-02-22T10:28:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=1624 correlation_id=corr-db_con-1059
+2026-02-22T10:29:00+00:00 level=ERROR stream=db event=pool_exhausted pool_in_use=100 pool_max=100 wait_ms=1233 correlation_id=corr-db_con-6941

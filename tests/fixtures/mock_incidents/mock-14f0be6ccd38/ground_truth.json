@@ -1,0 +1,12 @@
+{
+  "blast_radius": "api_and_ui",
+  "bundle_id": "mock-14f0be6ccd38",
+  "confidence_target_max": 0.95,
+  "confidence_target_min": 0.7,
+  "expected_first_signal": "api_error_rate",
+  "root_cause": "db_pool_limit",
+  "scenario_id": "db_connection_pool_exhaustion",
+  "threshold_default": 0.7,
+  "threshold_override": null,
+  "trigger": "traffic_spike"
+}
