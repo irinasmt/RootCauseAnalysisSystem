@@ -17,8 +17,6 @@ Most observability tools can tell you _something is wrong_. This project aims to
 
 ## Current focus (v0)
 
-
-
 ## Fixture pipeline runner
 
 Run one command to ingest a scenario fixture into Neo4j (mesh + logs + diff index)

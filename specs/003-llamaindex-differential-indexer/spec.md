@@ -17,7 +17,7 @@
 - Q: Does the entire codebase need to be indexed on day one? → A: No. Indexing is incident-driven and lazy: only files touched by commits in the incident window are indexed on demand. A bounded backfill (configurable, default 90 days) is run once per service on first connection.
 - Q: How does the indexer know which repo to query given an incident? → A: Via a `ServiceRepoMap` config that resolves `incident.service → (repo_url, language)`. This is provided at startup.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Build Node-Level Differential Context (Priority: P1)
 
@@ -100,7 +100,7 @@ As the Brain runtime, I want to query the graph via LlamaIndex's retriever API s
 - `git blame` integration and latent change detection (deferred — see future development notes).
 - Cross-incident hot-spot correlation and `implicated_in` graph edges (deferred).
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -133,17 +133,17 @@ As the Brain runtime, I want to query the graph via LlamaIndex's retriever API s
 - **DifferentialIndexerRequest**: Input containing service name, commit SHA, target file paths, and feature flags (e.g. `enable_semantic_delta`).
 - **ServiceRepoMap**: Adapter that resolves `service_name → (repo_url, language)`. Injected at construction time.
 - **BackfillPolicy**: Value object specifying the lookback window (`max_days`, default `90`) and commit batch size for the initial service onboarding backfill.
-- **PropertyGraphIndex** *(LlamaIndex native)*: The persistent graph store. Nodes are `TextNode` objects with enriched metadata. Edges represent hierarchy (`parent_of`, `child_of`) and change provenance (`modified_in:<commit_sha>`).
-- **KuzuPropertyGraphStore** *(LlamaIndex native, CI fallback)*: Embedded file-based graph database. Zero infrastructure required. Retained for offline CI only — not the primary runtime.
-- **Neo4jPropertyGraphStore** *(LlamaIndex native, primary)*: Neo4j graph database. Used for all local development (Docker) and production (AuraDB). Enables Cypher traversal, Neo4j Browser visualization, and horizontal scale. Substituted via constructor injection. Connection config via `NEO4J_URL`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE` env vars.
-- **GeminiEmbedding** *(LlamaIndex native, `llama-index-embeddings-gemini`)*: Embedding model used by `PropertyGraphIndex` for vector similarity. MUST be set globally via `llama_index.core.Settings.embed_model` before index construction. Default model: `models/text-embedding-004`. LlamaIndex's own default (`OpenAIEmbedding`) is incompatible with this project's Gemini-first configuration.
+- **PropertyGraphIndex** _(LlamaIndex native)_: The persistent graph store. Nodes are `TextNode` objects with enriched metadata. Edges represent hierarchy (`parent_of`, `child_of`) and change provenance (`modified_in:<commit_sha>`).
+- **KuzuPropertyGraphStore** _(LlamaIndex native, CI fallback)_: Embedded file-based graph database. Zero infrastructure required. Retained for offline CI only — not the primary runtime.
+- **Neo4jPropertyGraphStore** _(LlamaIndex native, primary)_: Neo4j graph database. Used for all local development (Docker) and production (AuraDB). Enables Cypher traversal, Neo4j Browser visualization, and horizontal scale. Substituted via constructor injection. Connection config via `NEO4J_URL`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE` env vars.
+- **GeminiEmbedding** _(LlamaIndex native, `llama-index-embeddings-gemini`)_: Embedding model used by `PropertyGraphIndex` for vector similarity. MUST be set globally via `llama_index.core.Settings.embed_model` before index construction. Default model: `models/text-embedding-004`. LlamaIndex's own default (`OpenAIEmbedding`) is incompatible with this project's Gemini-first configuration.
 
 ## Storage Tiers
 
-| Tier | Implementation | When to Use |
-|---|---|---|
-| Local dev + production | `Neo4jPropertyGraphStore` (Docker or AuraDB) | Primary — Cypher traversal; Neo4j Browser; AuraDB free tier for production |
-| CI / offline fallback | `KuzuPropertyGraphStore` (embedded, file-based) | No infra required; when `NEO4J_PASSWORD` is not set |
+| Tier                   | Implementation                                  | When to Use                                                                |
+| ---------------------- | ----------------------------------------------- | -------------------------------------------------------------------------- |
+| Local dev + production | `Neo4jPropertyGraphStore` (Docker or AuraDB)    | Primary — Cypher traversal; Neo4j Browser; AuraDB free tier for production |
+| CI / offline fallback  | `KuzuPropertyGraphStore` (embedded, file-based) | No infra required; when `NEO4J_PASSWORD` is not set                        |
 
 Both implement `AbstractPropertyGraphStore`. The factory auto-selects: Neo4j when `NEO4J_PASSWORD` is set, Kuzu otherwise.
 
@@ -151,9 +151,9 @@ Docker quick-start for local Neo4j::
 
     docker run --rm -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/password neo4j:5
 
-Then browse: http://localhost:7474  (login: neo4j / password)
+Then browse: http://localhost:7474 (login: neo4j / password)
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

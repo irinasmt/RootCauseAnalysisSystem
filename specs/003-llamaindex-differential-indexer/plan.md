@@ -95,5 +95,5 @@ tests/
 ## Complexity Tracking
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| N/A | N/A | N/A |
+| --------- | ---------- | ------------------------------------ |
+| N/A       | N/A        | N/A                                  |
