@@ -1,0 +1,11 @@
+--- a/src/OrderService/Data/OrderDbContext.cs
++++ b/src/OrderService/Data/OrderDbContext.cs
+@@ -17,7 +17,7 @@
+             var connStr = _config.GetConnectionString("OrdersDb");
+             optionsBuilder.UseNpgsql(connStr, npgsql =>
+             {
+-                npgsql.MaxPoolSize(20);
++                npgsql.MaxPoolSize(5);   // reduced from 20 — cost optimisation
+                 npgsql.MinPoolSize(1);
+                 npgsql.ConnectionIdleLifetime(TimeSpan.FromMinutes(2));
+             });

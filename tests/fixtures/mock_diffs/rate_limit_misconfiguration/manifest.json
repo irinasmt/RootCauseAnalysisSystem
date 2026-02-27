@@ -1,0 +1,26 @@
+{
+  "scenario_id": "rate_limit_misconfiguration",
+  "service": "api-gateway",
+  "commit_sha": "7a430f03da90",
+  "description": "New rate-limiter middleware added in Python, Helm values YAML, and TOML gateway config. Root cause: middleware registered before auth in all three places \u2014 unauthenticated requests consume the per-user quota keyed on X-User-Id which is absent pre-auth, causing all anonymous traffic to share one bucket and trigger 429s.",
+  "files": [
+    {
+      "path": "src/middleware/rate_limiter.py",
+      "language": "python",
+      "content_file": "files/src/middleware/rate_limiter.py",
+      "diff_file": "diffs/src/middleware/rate_limiter.py.diff"
+    },
+    {
+      "path": "helm/api-gateway/values.yaml",
+      "language": "yaml",
+      "content_file": "files/helm/api-gateway/values.yaml",
+      "diff_file": "diffs/helm/api-gateway/values.yaml.diff"
+    },
+    {
+      "path": "config/gateway.toml",
+      "language": "toml",
+      "content_file": "files/config/gateway.toml",
+      "diff_file": "diffs/config/gateway.toml.diff"
+    }
+  ]
+}

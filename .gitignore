@@ -24,6 +24,9 @@ coverage/
 *.log
 !tests/fixtures/mock_incidents/**/*.log
 
+# Brain run logs (generated at runtime)
+tests/fixtures/**/brain_runs/
+
 # Editors / OS
 .DS_Store
 Thumbs.db

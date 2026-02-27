@@ -1,0 +1,14 @@
+[service]
+name = "api-gateway"
+version = "2.1.0"
+
+[middleware]
+rate_limiting_enabled = true
+rate_limiting_position = "pre_auth"   # should be post_auth
+max_requests_per_minute = 60
+window_seconds = 60
+
+[auth]
+provider = "jwt"
+jwks_url = "https://auth.internal/.well-known/jwks.json"
+audience = "api.internal"

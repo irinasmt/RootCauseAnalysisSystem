@@ -1,0 +1,18 @@
+{
+  "artifacts": [
+    "ui_events.log",
+    "order_logs.log",
+    "payment_logs.log",
+    "shipping_logs.log",
+    "mesh_events.jsonl"
+  ],
+  "changed_services": [
+    "payment-service"
+  ],
+  "diff_fixture": "diffs/payment_timeout_tightening",
+  "incident_window_end": "2026-02-22T10:30:00+00:00",
+  "incident_window_start": "2026-02-22T10:15:00+00:00",
+  "scenario_id": "order_slow_due_to_payment",
+  "time_anchor": "2026-02-22T10:00:00+00:00",
+  "triggered_service": "order-service"
+}

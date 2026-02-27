@@ -1,0 +1,16 @@
+[service]
+name = "order-service"
+version = "2.4.1"
+environment = "production"
+
+[database]
+max_pool_size = 5
+min_pool_size = 1
+command_timeout_seconds = 30
+retry_on_failure = true
+max_retries = 3
+
+[observability]
+metrics_port = 9090
+tracing_enabled = true
+log_level = "warning"

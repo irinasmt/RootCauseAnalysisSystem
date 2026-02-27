@@ -1,0 +1,9 @@
+--- a/config/feature_flags.json
++++ b/config/feature_flags.json
+@@ -2,7 +2,7 @@
+   "flags": {
+-    "new_auth_flow": false,
++    "new_auth_flow": true,
+     "legacy_checkout": false,
+     "enable_recommendations": true,
+     "strict_rate_limiting": false

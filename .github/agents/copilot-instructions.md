@@ -25,5 +25,14 @@ Python 3.12+: Follow standard conventions
 
 - 001-build-realistic-mock: Added Python 3.12+ + Pydantic v2, standard library (`json`, `pathlib`, `datetime`, `random`), pytest
 
-<!-- MANUAL ADDITIONS START -->
-<!-- MANUAL ADDITIONS END -->
+## Architecture Principles
+
+- Architecture review stance:
+  - Do not blindly accept architecture decisions.
+  - Always evaluate whether a simpler, safer, or more scalable design exists.
+  - For non-trivial architecture choices, present at least one alternative with explicit tradeoffs
+    (complexity, operability, cost, reliability, and migration impact).
+  - If the proposed architecture appears risky or over-engineered, call it out clearly and suggest
+    a concrete improvement path.
+  - Prefer evidence-driven recommendations (tests, failure modes, runtime constraints, data shape,
+    and production operability) over stylistic preference.

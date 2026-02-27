@@ -1,0 +1,10 @@
+--- a/src/feature_flags.py
++++ b/src/feature_flags.py
+@@ -8,7 +8,7 @@
+ _FLAG_DEFAULTS: dict[str, bool] = {
+-    "new_auth_flow": False,
++    "new_auth_flow": True,   # flipped: was False
+     "legacy_checkout": False,
+     "enable_recommendations": True,
+     "strict_rate_limiting": False,
+ }

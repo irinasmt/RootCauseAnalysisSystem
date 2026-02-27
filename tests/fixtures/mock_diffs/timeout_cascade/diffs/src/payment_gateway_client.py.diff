@@ -1,0 +1,10 @@
+--- a/src/payment_gateway_client.py
++++ b/src/payment_gateway_client.py
+@@ -4,6 +4,6 @@
+ import os
+ import httpx
+ 
+ GATEWAY_URL = os.getenv("GATEWAY_URL", "https://payments.internal")
+-TIMEOUT_SECONDS = float(os.getenv("GATEWAY_TIMEOUT", "30"))
++TIMEOUT_SECONDS = float(os.getenv("GATEWAY_TIMEOUT", "15"))  # was 30
+ MAX_RETRIES = int(os.getenv("GATEWAY_MAX_RETRIES", "3"))

@@ -1,0 +1,10 @@
+--- a/k8s/payment-service-configmap.yaml
++++ b/k8s/payment-service-configmap.yaml
+@@ -6,6 +6,6 @@
+ data:
+   GATEWAY_URL: "https://payments.internal"
+-  GATEWAY_TIMEOUT: "30"
++  GATEWAY_TIMEOUT: "15"
+   GATEWAY_MAX_RETRIES: "3"
+   LOG_LEVEL: "info"
+   ENABLE_CIRCUIT_BREAKER: "true"

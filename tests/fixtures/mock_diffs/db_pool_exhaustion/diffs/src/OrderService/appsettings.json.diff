@@ -1,0 +1,10 @@
+--- a/src/OrderService/appsettings.json
++++ b/src/OrderService/appsettings.json
+@@ -4,7 +4,7 @@
+   "Database": {
+-    "MaxPoolSize": 20,
++    "MaxPoolSize": 5,
+     "MinPoolSize": 1,
+     "CommandTimeoutSeconds": 30,
+     "EnableSensitiveDataLogging": false
+   },

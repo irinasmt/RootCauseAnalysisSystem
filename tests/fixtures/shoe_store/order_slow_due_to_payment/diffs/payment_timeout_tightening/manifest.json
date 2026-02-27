@@ -1,0 +1,20 @@
+{
+  "scenario_id": "payment_timeout_tightening",
+  "service": "payment-service",
+  "commit_sha": "shoepay10to30",
+  "description": "Payment timeout reduced from 30s to 10s in payment-service; under peak load the gateway often responds slower than 10s, causing retries/timeouts and cascading order-service latency.",
+  "files": [
+    {
+      "path": "src/payment_gateway_client.py",
+      "language": "python",
+      "content_file": "files/src/payment_gateway_client.py",
+      "diff_file": "diffs/src/payment_gateway_client.py.diff"
+    },
+    {
+      "path": "k8s/payment-service-configmap.yaml",
+      "language": "yaml",
+      "content_file": "files/k8s/payment-service-configmap.yaml",
+      "diff_file": "diffs/k8s/payment-service-configmap.yaml.diff"
+    }
+  ]
+}

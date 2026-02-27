@@ -1,0 +1,52 @@
+{
+  "edges": [
+    {
+      "from": "ui-web",
+      "to": "order-service",
+      "type": "sync_http"
+    },
+    {
+      "from": "order-service",
+      "to": "payment-service",
+      "type": "sync_http"
+    },
+    {
+      "from": "payment-service",
+      "to": "payment-gateway",
+      "type": "sync_http"
+    },
+    {
+      "from": "order-service",
+      "to": "inventory-service",
+      "type": "sync_http"
+    },
+    {
+      "from": "order-service",
+      "to": "shipping-service",
+      "type": "sync_http"
+    },
+    {
+      "from": "shipping-service",
+      "to": "shipping-carrier-api",
+      "type": "sync_http"
+    },
+    {
+      "from": "order-service",
+      "to": "notification-service",
+      "type": "async_event"
+    }
+  ],
+  "external_dependencies": [
+    "payment-gateway",
+    "shipping-carrier-api"
+  ],
+  "services": [
+    "ui-web",
+    "order-service",
+    "payment-service",
+    "inventory-service",
+    "shipping-service",
+    "notification-service"
+  ],
+  "system": "shoe-ordering-platform"
+}

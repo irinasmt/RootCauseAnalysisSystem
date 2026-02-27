@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-service-config
+  namespace: production
+data:
+  PAYMENT_GATEWAY_URL: "https://gateway.payments.example"
+  PAYMENT_TIMEOUT_SECONDS: "10"
+  PAYMENT_MAX_RETRIES: "2"

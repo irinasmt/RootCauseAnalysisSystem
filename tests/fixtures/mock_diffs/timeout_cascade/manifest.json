@@ -1,0 +1,26 @@
+{
+  "scenario_id": "timeout_cascade",
+  "service": "payment-service",
+  "commit_sha": "388b61eeced3",
+  "description": "HTTP timeout halved from 30 \u2192 15 s across a Python client, a Kubernetes ConfigMap YAML, and the .env defaults file. Root cause: downstream payment gateway started responding in 20 s during peak load, causing cascading 504s after the deploy.",
+  "files": [
+    {
+      "path": "src/payment_gateway_client.py",
+      "language": "python",
+      "content_file": "files/src/payment_gateway_client.py",
+      "diff_file": "diffs/src/payment_gateway_client.py.diff"
+    },
+    {
+      "path": "k8s/payment-service-configmap.yaml",
+      "language": "yaml",
+      "content_file": "files/k8s/payment-service-configmap.yaml",
+      "diff_file": "diffs/k8s/payment-service-configmap.yaml.diff"
+    },
+    {
+      "path": ".env.defaults",
+      "language": "env",
+      "content_file": "files/.env.defaults",
+      "diff_file": "diffs/.env.defaults.diff"
+    }
+  ]
+}

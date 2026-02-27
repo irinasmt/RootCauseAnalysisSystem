@@ -1,0 +1,26 @@
+{
+  "scenario_id": "db_pool_exhaustion",
+  "service": "order-service",
+  "commit_sha": "fb0925d1024c",
+  "description": "DB connection pool max_size reduced from 20 \u2192 5 in a C# DbContext, appsettings.json, and TOML service config. Root cause: connection exhaustion under load after the pool was shrunk during a cost-cutting sprint.",
+  "files": [
+    {
+      "path": "src/OrderService/Data/OrderDbContext.cs",
+      "language": "csharp",
+      "content_file": "files/src/OrderService/Data/OrderDbContext.cs",
+      "diff_file": "diffs/src/OrderService/Data/OrderDbContext.cs.diff"
+    },
+    {
+      "path": "src/OrderService/appsettings.json",
+      "language": "json",
+      "content_file": "files/src/OrderService/appsettings.json",
+      "diff_file": "diffs/src/OrderService/appsettings.json.diff"
+    },
+    {
+      "path": "config/service.toml",
+      "language": "toml",
+      "content_file": "files/config/service.toml",
+      "diff_file": "diffs/config/service.toml.diff"
+    }
+  ]
+}

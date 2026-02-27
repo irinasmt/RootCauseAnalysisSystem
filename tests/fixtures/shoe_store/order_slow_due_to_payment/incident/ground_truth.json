@@ -1,0 +1,10 @@
+{
+  "affected_service": "order-service",
+  "changed_service": "payment-service",
+  "expected_first_signal": "mesh_latency_and_503_on_order_to_payment",
+  "failing_edge": "order-service->payment-service",
+  "root_cause": "payment_gateway_timeout_too_aggressive",
+  "scenario_id": "order_slow_due_to_payment",
+  "trigger": "order_service_latency_spike",
+  "upstream_failing_edge": "payment-service->payment-gateway"
+}

@@ -1,0 +1,10 @@
+{
+  "flags": {
+    "new_auth_flow": true,
+    "legacy_checkout": false,
+    "enable_recommendations": true,
+    "strict_rate_limiting": false
+  },
+  "overrides": {},
+  "schema_version": "1.2"
+}

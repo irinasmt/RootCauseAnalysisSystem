@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-service-config
+  namespace: production
+data:
+  GATEWAY_URL: "https://payments.internal"
+  GATEWAY_TIMEOUT: "15"
+  GATEWAY_MAX_RETRIES: "3"
+  LOG_LEVEL: "info"
+  ENABLE_CIRCUIT_BREAKER: "true"

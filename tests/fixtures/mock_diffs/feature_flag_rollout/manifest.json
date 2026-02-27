@@ -1,0 +1,32 @@
+{
+  "scenario_id": "feature_flag_rollout",
+  "service": "auth-service",
+  "commit_sha": "ba230e02b846",
+  "description": "new_auth_flow flag flipped to True in a Python resolver, feature_flags.json, .env.features, and auth.ini simultaneously. Root cause: the Python resolver has a bug \u2014 env overrides are loaded but never consulted, so the new (broken) auth flow activates for all users regardless of partial rollout intent.",
+  "files": [
+    {
+      "path": "src/feature_flags.py",
+      "language": "python",
+      "content_file": "files/src/feature_flags.py",
+      "diff_file": "diffs/src/feature_flags.py.diff"
+    },
+    {
+      "path": "config/feature_flags.json",
+      "language": "json",
+      "content_file": "files/config/feature_flags.json",
+      "diff_file": "diffs/config/feature_flags.json.diff"
+    },
+    {
+      "path": ".env.features",
+      "language": "env",
+      "content_file": "files/.env.features",
+      "diff_file": "diffs/.env.features.diff"
+    },
+    {
+      "path": "config/auth.ini",
+      "language": "ini",
+      "content_file": "files/config/auth.ini",
+      "diff_file": "diffs/config/auth.ini.diff"
+    }
+  ]
+}

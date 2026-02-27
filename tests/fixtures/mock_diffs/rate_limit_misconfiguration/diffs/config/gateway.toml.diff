@@ -1,0 +1,12 @@
+--- a/config/gateway.toml
++++ b/config/gateway.toml
+@@ -4,6 +4,11 @@
+
++[middleware]
++rate_limiting_enabled = true
++rate_limiting_position = "pre_auth"   # should be post_auth
++max_requests_per_minute = 60
++window_seconds = 60
++
+ [auth]
+ provider = "jwt"

@@ -17,12 +17,29 @@ Most observability tools can tell you _something is wrong_. This project aims to
 
 ## Current focus (v0)
 
-- Kubernetes only (single cluster)
-- Metrics-based anomaly detection (Prometheus-style signals)
-- Release/commit correlation (deployment timeline + git history)
-- Human-readable RCA report with evidence citations
 
-## Non-goals (for now)
+
+## Fixture pipeline runner
+
+Run one command to ingest a scenario fixture into Neo4j (mesh + logs + diff index)
+and execute the Brain:
+
+```bash
+python run_fixture_pipeline.py tests/fixtures/shoe_store/order_slow_due_to_payment
+```
+
+Requirements:
+
+- Neo4j running and reachable via `NEO4J_URL`
+- `NEO4J_USERNAME`, `NEO4J_PASSWORD` set (in `.env` is fine)
+
+What it does:
+
+1. Clears Neo4j (unless `--no-reset` is passed)
+2. Inserts service mesh events as `:MESH_CALL` relationships
+3. Inserts logs as `:LogLine` nodes linked from `:Service`
+4. Indexes all mock-diff bundles under `<fixture>/diffs/*`
+5. Runs `BrainEngine` with graph index wired into `git_scout`
 
 - Multi-cloud / multi-cluster federation
 - Full distributed tracing requirements

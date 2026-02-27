@@ -1,0 +1,28 @@
+# Helm values for api-gateway
+replicaCount: 3
+
+image:
+  repository: myregistry/api-gateway
+  tag: "2.1.0"
+  pullPolicy: IfNotPresent
+
+rateLimiting:
+  enabled: true
+  maxRequestsPerMinute: 60
+  windowSeconds: 60
+  keyHeader: "X-User-Id"
+
+middleware:
+  order:
+    - rate_limiter     # WRONG: should be after auth
+    - auth
+    - logging
+    - cors
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

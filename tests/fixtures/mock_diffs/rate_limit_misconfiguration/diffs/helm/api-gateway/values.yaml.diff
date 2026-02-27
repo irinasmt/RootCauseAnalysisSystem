@@ -1,0 +1,17 @@
+--- a/helm/api-gateway/values.yaml
++++ b/helm/api-gateway/values.yaml
+@@ -8,6 +8,14 @@
++rateLimiting:
++  enabled: true
++  maxRequestsPerMinute: 60
++  windowSeconds: 60
++  keyHeader: "X-User-Id"
++
++middleware:
++  order:
++    - rate_limiter     # WRONG: should be after auth
++    - auth
++    - logging
++    - cors
++
+ resources:

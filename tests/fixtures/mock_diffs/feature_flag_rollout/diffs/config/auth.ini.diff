@@ -1,0 +1,9 @@
+--- a/config/auth.ini
++++ b/config/auth.ini
+@@ -2,7 +2,7 @@
+ [auth]
+ provider = oauth2
+-new_flow_enabled = false
++new_flow_enabled = true
+ session_timeout_minutes = 60
+ max_sessions_per_user = 5
