@@ -55,7 +55,9 @@ class BrainState(BaseModel):
     # Mesh graph traversal summary (populated by mesh_scout)
     mesh_summary: str = ""
     # Fix advisor outputs (populated by fix_advisor)
-    fix_summary: str = ""
+    fix_summary: str = ""          # combined one-liner for backward compat
+    fix_immediate: str = ""         # what the on-call engineer does right now
+    fix_longterm: str = ""          # durable architectural improvement
     fix_confidence: float = 0.0
     fix_reasoning: str = ""
 
@@ -94,6 +96,8 @@ class CriticOutput(BaseModel):
 
 
 class FixAdvisorOutput(BaseModel):
-    fix_summary: str = Field(min_length=1, description="Suggested fix must be non-empty")
+    fix_summary: str = Field(min_length=1, description="Combined one-liner fix must be non-empty")
+    fix_immediate: str = Field(min_length=1, description="Immediate mitigation action must be non-empty")
+    fix_longterm: str = Field(min_length=1, description="Durable architectural fix must be non-empty")
     fix_confidence: float = Field(ge=0.0, le=1.0, description="Fix confidence must be between 0.0 and 1.0")
     fix_reasoning: str = Field(min_length=1, description="Fix reasoning must be non-empty")

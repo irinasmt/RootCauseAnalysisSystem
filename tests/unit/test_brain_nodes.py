@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from unittest.mock import MagicMock
 
 from rca.brain.models import ApprovedIncident, BrainState
-from rca.brain.nodes import critic, git_scout, metric_analyst, rca_synthesizer, supervisor
+from rca.brain.nodes import critic, git_scout, mesh_scout, metric_analyst, rca_synthesizer, supervisor
 
 
 def make_state() -> BrainState:
@@ -87,3 +87,36 @@ def test_git_scout_queries_each_suspect_service() -> None:
     q2 = mock_retriever.retrieve.call_args_list[1][0][0]
     assert "service:checkout-api" in q1
     assert "service:payment-api" in q2
+
+
+def test_mesh_scout_surfaces_third_party_labels_in_summary() -> None:
+    incident = ApprovedIncident(
+        incident_id="inc-mesh-3",
+        service="order-service",
+        started_at=datetime(2026, 2, 22, 10, 0, tzinfo=timezone.utc),
+        deployment_id="deploy-43",
+    )
+    state = BrainState(incident=incident)
+
+    mock_session = MagicMock()
+    mock_session.run.return_value = [
+        {
+            "svc": "payment-gateway",
+            "is_external": True,
+            "dependency_type": "third_party_api",
+            "ownership": "external_not_owned",
+            "is_third_party_api": True,
+            "error_count": 20,
+            "call_count": 100,
+            "avg_latency_ms": 750,
+            "p99_latency_ms": 1200,
+        }
+    ]
+    mock_driver = MagicMock()
+    mock_driver.session.return_value.__enter__.return_value = mock_session
+
+    updated = mesh_scout(state, mesh_driver=mock_driver)
+
+    assert "payment-gateway" in updated.suspect_services
+    assert "third_party_api" in updated.mesh_summary
+    assert "external_not_owned" in updated.mesh_summary

@@ -34,23 +34,32 @@ print(report.status, report.critic_score, report.fix_confidence)
 ## Architecture diagram
 
 ```mermaid
-flowchart TD
-    I([ApprovedIncident]) --> S((Supervisor))
+flowchart LR
+  subgraph P[Brain Pipeline]
+    direction LR
+    I([Approved Incident]) --> S((Supervisor))
+    S --> X((Mesh Scout))
+    X --> G((Git Scout))
+    G --> M((Metric Analyst))
+    M --> Y((RCA Synthesizer))
+    Y --> C((The Critic))
+    C --> FA((Fix Advisor))
+  end
 
-  S --> X((Mesh_Scout))
-  X --> G((Git_Scout))
-  G --> M((Metric_Analyst))
-  M --> Y((RCA_Synthesizer))
-  Y --> C((The_Critic))
-  C --> FA((Fix_Advisor))
+  subgraph D[Data Inputs]
+    direction TB
+    MG[(Mesh Graph Neo4j<br/>DEPENDS_ON + OBSERVED_CALL)]
+    ME[(Incident Events Bundle<br/>latency/errors/retries + logs)]
+    CG[(Diff Code Graph Neo4j<br/>service/commit/symbol/status/text)]
+  end
 
-  MG[(Service Mesh Graph Neo4j\nDEPENDS_ON + OBSERVED_CALL)] --> X
-  ME[(Incident Mesh Events bundle\nlatency/errors/retries)] --> M
-  CG[(Differential Code Graph Neo4j\nservice/commit/symbol/status/text)] --> G
+  X -. reads .-> MG
+  M -. reads .-> ME
+  G -. reads .-> CG
 
-  C -->|score < threshold AND iteration < max| S
-  FA -->|critic_score >= 0.80 OR fix_confidence >= 0.75| F([Final RCA Report\nstatus: completed])
-  FA -->|both scores below threshold| E([Escalation Report\nstatus: escalated])
+  C -->|score < threshold and iteration < max| S
+  FA -->|critic_score >= 0.80 or fix_confidence >= 0.75| F([Final RCA Report<br/>status: completed])
+  FA -->|both scores below threshold| E([Escalation Report<br/>status: escalated])
 ```
 
 ## Node responsibilities
@@ -164,8 +173,12 @@ Operational detail:
 Operational detail:
 
 - Receives all ranked hypotheses, the top candidate's summary, and the critic's specific objections.
-- Explicitly reasons across all plausible causes to find the _convergent remediation_: the fix that is safe and effective whether cause X or cause Y turns out to be true.
-- Considers ownership: if the failing component is a third-party or external service, the fix targets the caller's configuration (timeouts, circuit breakers, rate limits) rather than requiring changes the team cannot make.
+- Produces a **two-track remediation plan** — always both tracks, for every incident:
+  - **Immediate mitigation** (`fix_immediate`): the fastest safe action an on-call engineer can apply within minutes to stop the bleeding, valid regardless of which hypothesis is correct. Examples: rollback, circuit-breaker activation, retry-count reduction, feature-flag disable.
+  - **Long-term fix** (`fix_longterm`): the durable architectural improvement that prevents recurrence. Must include resilience controls (bounded retries, exponential backoff + jitter, circuit breaker), SLO-aligned observability, canary rollout, and explicit rollback criteria.
+- Considers ownership: if the failing component is a third-party or external service, the fix targets the caller's resilience layer rather than requiring changes the team cannot make.
+- Scenario-agnostic policy: both tracks are required for every scenario — timeout/retry incidents, config errors, resource exhaustion, and anything else.
+- Guardrail: a bare timeout increase as the immediate fix is replaced with circuit-breaker + retry-reduction when upstream-call signals are present.
 - `fix_confidence` guide:
   - `0.9+` — fix is clearly safe under all plausible causes
   - `0.7–0.89` — covers most cases with low risk
@@ -254,7 +267,8 @@ This two-track approach keeps the `critic_score` honest (it measures _causal pro
 - Ranked hypotheses with confidence and cited evidence.
 - `critic_score` — how strongly the evidence proves the exact root cause (0.0–1.0).
 - `fix_confidence` — how confidently the suggested fix resolves the incident across all plausible causes (0.0–1.0).
-- `fix_summary` — the concrete remediation action (e.g. "increase `payment-service` timeout to 5s and add circuit breaker on `payment-gateway` calls").
-- `fix_reasoning` — explicit argument for why the fix holds regardless of which hypothesis is true.
+- `fix_immediate` — what the on-call engineer should do right now to stop the bleeding (e.g. "activate circuit breaker on payment-gateway calls and reduce retries to 2").
+- `fix_longterm` — the durable architectural fix to prevent recurrence (e.g. "implement exponential backoff + jitter, circuit breaker, SLO-aligned timeout budgets, canary rollout with rollback criteria").
+- `fix_reasoning` — explicit argument for why both fixes hold regardless of which hypothesis is true.
 - Machine-readable `RcaReport` (JSON) plus human-readable console summary.
 - Escalation package (status `escalated`) when both `critic_score` and `fix_confidence` remain below threshold after all iterations.

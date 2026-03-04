@@ -40,6 +40,18 @@
     "payment-gateway",
     "shipping-carrier-api"
   ],
+  "external_dependency_labels": {
+    "payment-gateway": {
+      "dependency_type": "third_party_api",
+      "ownership": "external_not_owned",
+      "is_in_mesh_topology": true
+    },
+    "shipping-carrier-api": {
+      "dependency_type": "third_party_api",
+      "ownership": "external_not_owned",
+      "is_in_mesh_topology": true
+    }
+  },
   "services": [
     "ui-web",
     "order-service",

@@ -21,6 +21,18 @@ ARCHITECTURE = {
         "payment-gateway",
         "shipping-carrier-api",
     ],
+    "external_dependency_labels": {
+        "payment-gateway": {
+            "dependency_type": "third_party_api",
+            "ownership": "external_not_owned",
+            "is_in_mesh_topology": True,
+        },
+        "shipping-carrier-api": {
+            "dependency_type": "third_party_api",
+            "ownership": "external_not_owned",
+            "is_in_mesh_topology": True,
+        },
+    },
     "edges": [
         {"from": "ui-web", "to": "order-service", "type": "sync_http"},
         {"from": "order-service", "to": "payment-service", "type": "sync_http"},

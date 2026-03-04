@@ -165,6 +165,9 @@ def mesh_scout(state: BrainState, mesh_driver=None) -> BrainState:
             RETURN DISTINCT
                 dep.name AS svc,
                 dep.is_external AS is_external,
+                dep.dependency_type AS dependency_type,
+                dep.ownership AS ownership,
+                dep.is_third_party_api AS is_third_party_api,
                 o.error_count AS error_count,
                 o.call_count AS call_count,
                 o.avg_latency_ms AS avg_latency_ms,
@@ -179,24 +182,42 @@ def mesh_scout(state: BrainState, mesh_driver=None) -> BrainState:
 
             for row in rows:
                 svc = row["svc"]
+                is_external = bool(row["is_external"])
+                dependency_type = str(row["dependency_type"] or "").strip()
+                ownership = str(row["ownership"] or "").strip()
+                is_third_party_api = bool(row["is_third_party_api"])
                 error_count = row["error_count"] or 0
                 call_count = row["call_count"] or 0
                 avg_lat = row["avg_latency_ms"] or 0.0
                 p99_lat = row["p99_latency_ms"] or 0.0
                 err_rate = (error_count / call_count) if call_count > 0 else 0.0
 
+                label_parts: list[str] = []
+                if is_external:
+                    label_parts.append("external")
+                if dependency_type:
+                    label_parts.append(dependency_type)
+                if ownership:
+                    label_parts.append(ownership)
+                if is_third_party_api and "third_party_api" not in label_parts:
+                    label_parts.append("third_party_api")
+                label_suffix = f" [{', '.join(label_parts)}]" if label_parts else ""
+
                 if call_count > 0:
                     # Score: weight error rate heavily, normalise latency as secondary signal
                     score = err_rate * 10.0 + (avg_lat / 100.0)
                     suspects_observed.append((svc, score))
                     summary_lines.append(
-                        f"  {svc}: {call_count} calls, {error_count} errors "
+                        f"  {svc}{label_suffix}: {call_count} calls, {error_count} errors "
                         f"({err_rate:.0%} err rate), avg {avg_lat:.0f}ms, p99 {p99_lat:.0f}ms"
                     )
                     state.evidence_refs.append(f"mesh:observed:{svc}")
                 else:
                     suspects_arch_only.append(svc)
-                    summary_lines.append(f"  {svc}: architecture dependency (no observed calls in this scenario)")
+                    summary_lines.append(
+                        f"  {svc}{label_suffix}: architecture dependency "
+                        "(no observed calls in this scenario)"
+                    )
                     state.evidence_refs.append(f"mesh:depends_on:{svc}")
 
             # Rank: observed services by score desc, then arch-only, incident service always first
@@ -367,13 +388,14 @@ def git_scout(
         graph_block = ""
         if graph_context:
             graph_block = f"\n\nDifferential graph context (structured, no raw diff):\n{graph_context}"
+        mesh_block = f"\nMesh context: {state.mesh_summary}" if state.mesh_summary else ""
         prompt = f"""You are a software engineer reviewing a deployment that coincided with a production incident.
 
 Service: {state.incident.service}
 Suspect services in scope: {", ".join(_query_scopes(state))}
 Incident started: {state.incident.started_at.isoformat()}
 Deployment ID: {state.incident.deployment_id or "none"}
-Investigation plan: {state.task_plan}{graph_block}
+Investigation plan: {state.task_plan}{mesh_block}{graph_block}
 
 In 3-5 sentences, describe which categories of code changes in this deployment are most likely to have caused the incident.
 Prioritise: DB schema migrations, connection pool or timeout config changes, dependency version bumps, retry logic, caching changes.
@@ -442,6 +464,7 @@ def metric_analyst(state: BrainState, llm: LLMClient | None = None) -> BrainStat
             raw_logs_block = "\n\nRaw log evidence from the incident bundle:\n" + "\n".join(
                 f"  [{k}]\n{v}" for k, v in extra.items()
             )
+        mesh_block = f"\nMesh context: {state.mesh_summary}" if state.mesh_summary else ""
         prompt = f"""You are an SRE metrics expert analysing a production incident.
 
 Service: {state.incident.service}
@@ -449,7 +472,7 @@ Suspect services in scope: {", ".join(_query_scopes(state))}
 Incident started: {state.incident.started_at.isoformat()}
 Deployment: {state.incident.deployment_id or "none"}
 Investigation plan: {state.task_plan}
-Git context: {state.git_summary}{raw_logs_block}
+Git context: {state.git_summary}{mesh_block}{raw_logs_block}
 
 In 3-5 sentences, describe the likely metric anomaly pattern:
 - Which RED metrics (request rate, error rate, latency/p99) and resource signals (CPU, memory, DB connections) would confirm this incident.
@@ -487,6 +510,7 @@ def rca_synthesizer(state: BrainState, llm: LLMClient | None = None) -> BrainSta
             raw_logs_block = "\n\nRaw log evidence:\n" + "\n".join(
                 f"  [{k}]\n{v}" for k, v in extra.items()
             )
+        mesh_block = f"\nMesh context: {state.mesh_summary}" if state.mesh_summary else ""
         critique_block = ""
         if state.iteration > 1 and state.critic_reasoning:
             critique_block = f"\n\nA critic reviewed the previous hypotheses and noted these gaps in the evidence:\n{state.critic_reasoning}\nKeep the same hypotheses if they are still the best fit. Strengthen them by citing more specific evidence from the logs and metrics. Do NOT invent new root causes unless the evidence clearly rules out the existing ones."
@@ -497,7 +521,7 @@ Incident started: {state.incident.started_at.isoformat()}
 Deployment: {state.incident.deployment_id or "none"}
 Investigation plan: {state.task_plan}
 Git context: {state.git_summary}
-Metrics context: {state.metrics_summary}
+Metrics context: {state.metrics_summary}{mesh_block}
 Evidence refs: {", ".join(state.evidence_refs)}{raw_logs_block}{critique_block}
 
 Return ONLY a valid JSON object — no markdown, no extra text:
@@ -573,6 +597,7 @@ def critic(state: BrainState, llm: LLMClient | None = None) -> BrainState:
     top = max(state.hypotheses, key=lambda h: h.confidence)
 
     if llm:
+        mesh_block = f"\nService mesh context (ownership labels):\n{state.mesh_summary}" if state.mesh_summary else ""
         prompt = f"""You are a critical SRE reviewer. Your job is to DISPROVE the proposed root cause.
 
 Incident: {state.incident.service} at {state.incident.started_at.isoformat()}
@@ -580,8 +605,11 @@ Top hypothesis: "{top.title}"
 Explanation: {top.summary}
 Evidence: {", ".join(top.evidence_refs)}
 Deployment: {state.incident.deployment_id or "none"}
-Metrics context: {state.metrics_summary}
+Metrics context: {state.metrics_summary}{mesh_block}
 Investigation iteration: {state.iteration}
+
+IMPORTANT — service ownership:
+Services labelled [external, third_party_api, external_not_owned] in the mesh context are NOT owned by this team.
 
 Ask yourself:
 - Is there a simpler explanation that fits the data better?
@@ -618,16 +646,18 @@ Score guide: 0.9+ = definitive, 0.8 = strong, 0.6-0.79 = plausible, <0.6 = weak 
 # ---------------------------------------------------------------------------
 
 def fix_advisor(state: BrainState, llm: LLMClient | None = None) -> BrainState:
-    """Recommend the best remediation that holds across ALL plausible causes.
+    """Produce a two-track remediation plan: immediate mitigation and long-term fix.
 
-    The critic may flag evidential ambiguity (low cause_confidence), but the
-    on-call engineer still needs an action.  fix_advisor asks: "what single
-    intervention resolves the incident regardless of which hypothesis is
-    correct?"  fix_confidence is independent of cause certainty and drives
-    the final escalation decision.
+    - fix_immediate: the fastest safe action an on-call engineer can take right
+      now to stop the bleeding, regardless of which hypothesis is correct.
+    - fix_longterm: the durable architectural improvement that prevents recurrence
+      (resilience controls, observability, rollout safety).
+    - fix_summary: a single-line combination for backwards compat / quick display.
     """
     if not state.hypotheses:
         state.fix_summary = "No hypotheses available — manual investigation required."
+        state.fix_immediate = "Manual triage: inspect logs and recent deployments for the affected service."
+        state.fix_longterm = "Establish runbooks, alerting, and structured on-call process to reduce MTTD/MTTR."
         state.fix_confidence = 0.0
         state.fix_reasoning = "No hypotheses to base a fix on."
         return state
@@ -638,50 +668,80 @@ def fix_advisor(state: BrainState, llm: LLMClient | None = None) -> BrainState:
         for i, h in enumerate(state.hypotheses)
     )
 
+    immediate_default = (
+        "Apply a safe immediate mitigation for the affected service and verify error-rate recovery."
+    )
+    immediate_generic = (
+        "Roll back the most recent deployment to the affected service and confirm error rate recovers within 5 minutes. "
+        "If no recent deployment, open an on-call bridge, attach the current error/latency/saturation snapshot, "
+        "and scope blast radius before taking further action."
+    )
+
+    # --- Canonical long-term fixes keyed by signal type ---
+    longterm_default = (
+        "Implement a durable fix at the failure boundary and add rollout/observability safeguards to prevent recurrence."
+    )
+    longterm_generic = (
+        "Harden the failing boundary with input validation, rate limits, and an isolated fallback path. "
+        "Define SLO-aligned alerts, add structured runbooks, and establish a canary release process "
+        "with automated rollback on error-rate or latency threshold breach."
+    )
+
     if llm:
-        prompt = f"""You are an SRE fix advisor. The investigation team has produced hypotheses but the exact root cause is uncertain. Your job is NOT to determine the exact cause — the critic already flagged ambiguity. Your job is to recommend the single best remediation that is safe and effective across ALL plausible causes.
+        mesh_block = f"\nService mesh context (ownership labels):\n{state.mesh_summary}" if state.mesh_summary else ""
+        prompt = f"""You are an SRE fix advisor.
 
 Incident: {state.incident.service} at {state.incident.started_at.isoformat()}
 Top hypothesis: "{top.title}"
 Summary: {top.summary}
-Critic's concern: {state.critic_reasoning}
+Critic's concern: {state.critic_reasoning}{mesh_block}
 
 All hypotheses under consideration:
 {hyp_list}
 
-Ask yourself:
-- Is there a single fix that resolves the incident regardless of which hypothesis is correct?
-- What is the minimum-risk intervention an on-call engineer can safely apply right now?
-- Who owns the affected component — can we fix it ourselves or do we need to escalate to a third party?
-- Does the fix hold even if the critic's alternative explanation turns out to be true?
+OWNERSHIP RULES — you MUST follow these:
+- Services labelled [external, third_party_api, external_not_owned] in the mesh context are NOT owned by this team.
+- Phrase fixes as actions the on-call engineer can perform on services we own right now.
+
+Return two fixes:
+1) immediate_fix: what the developer/on-call should do now (on services we own only).
+2) longterm_fix: what should be implemented to prevent recurrence (resilience at the caller boundary).
 
 Return ONLY a valid JSON object — no markdown, no extra text:
-{{"fix": "Concise action: what to do and on which service/config", "fix_confidence": 0.90, "fix_reasoning": "This fix is valid because it addresses the symptom regardless of cause X or Y..."}}
-
-fix_confidence guide: 0.9+ = fix is safe under all plausible causes, 0.7-0.89 = covers most cases with low risk, <0.7 = uncertain or depends on which hypothesis is correct."""
+{{"immediate_fix": "...", "longterm_fix": "...", "fix_confidence": 0.90, "fix_reasoning": "Why these two fixes hold across all hypotheses..."}}
+"""
         try:
             parsed = llm.generate_json(prompt)
-            state.fix_summary = str(parsed.get("fix", "")).strip() or "No fix suggested."
+            state.fix_immediate = str(parsed.get("immediate_fix", "")).strip() or immediate_default
+            state.fix_longterm = str(parsed.get("longterm_fix", "")).strip() or longterm_default
             state.fix_confidence = max(0.0, min(1.0, float(parsed.get("fix_confidence", 0.5))))
             state.fix_reasoning = str(parsed.get("fix_reasoning", "")).strip() or "No reasoning provided."
+
+            state.fix_summary = f"[Now] {state.fix_immediate} | [Long-term] {state.fix_longterm}"
         except Exception as exc:
             state.errors.append(f"fix_advisor_parse_error: {exc}")
-            state.fix_summary = f"Fix advisor failed ({exc}). Manual review recommended."
+            state.fix_immediate = f"Fix advisor failed ({exc}). Manual review recommended."
+            state.fix_longterm = "Manual review required — see errors."
+            state.fix_summary = state.fix_immediate
             state.fix_confidence = 0.0
             state.fix_reasoning = f"LLM fix advisor error: {exc}"
     else:
         # Deterministic stub: derive fix_confidence from hypothesis agreement
         avg_confidence = sum(h.confidence for h in state.hypotheses) / len(state.hypotheses)
         state.fix_confidence = round(min(1.0, avg_confidence * 0.9), 2)
-        state.fix_summary = f"Investigate and remediate: {top.title.lower()} on {state.incident.service}."
+        state.fix_immediate = immediate_generic
+        state.fix_longterm = longterm_generic
         state.fix_reasoning = (
-            f"Stub fix advisor: derived from top hypothesis '{top.title}' "
-            f"(confidence {top.confidence:.2f}) averaged across {len(state.hypotheses)} hypothesis/es."
+            "Deterministic two-track fallback selected without LLM. "
+            f"Top hypothesis: '{top.title}' ({top.confidence:.2f})."
         )
+        state.fix_summary = f"[Now] {state.fix_immediate} | [Long-term] {state.fix_longterm}"
 
     # Validate fix_advisor output
     FixAdvisorOutput(
         fix_summary=state.fix_summary,
+        fix_immediate=state.fix_immediate,
+        fix_longterm=state.fix_longterm,
         fix_confidence=state.fix_confidence,
         fix_reasoning=state.fix_reasoning,
     )

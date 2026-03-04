@@ -54,16 +54,21 @@ def _print_brain_report(report) -> None:
     print(f"Iteration       : {report.metadata.get('iteration', '?')}")
     print(f"LLM enabled     : {report.metadata.get('llm_enabled', False)}")
 
-    fix_summary = report.metadata.get("fix_summary", "")
+    fix_immediate = report.metadata.get("fix_immediate", "")
+    fix_longterm = report.metadata.get("fix_longterm", "")
     fix_reasoning = report.metadata.get("fix_reasoning", "")
-    if fix_summary:
-        print("\nSuggested fix")
-        for line in textwrap.wrap(fix_summary, width=66):
+    if fix_immediate:
+        print("\nImmediate mitigation (do this now)")
+        for line in textwrap.wrap(fix_immediate, width=66):
             print(f"  {line}")
-        if fix_reasoning:
-            print("  Reasoning:")
-            for line in textwrap.wrap(fix_reasoning, width=64):
-                print(f"    {line}")
+    if fix_longterm:
+        print("\nLong-term fix (make the architecture robust)")
+        for line in textwrap.wrap(fix_longterm, width=66):
+            print(f"  {line}")
+    if fix_reasoning:
+        print("  Reasoning:")
+        for line in textwrap.wrap(fix_reasoning, width=64):
+            print(f"    {line}")
 
     if report.hypotheses:
         print("\nRanked hypotheses")
@@ -209,13 +214,19 @@ def _ingest_architecture(url: str, username: str, password: str, database: str, 
     arch = json.loads(arch_path.read_text(encoding="utf-8"))
     services: list[str] = arch.get("services", [])
     externals: set[str] = set(arch.get("external_dependencies", []))
+    external_labels: dict[str, dict] = arch.get("external_dependency_labels", {})
     edges: list[dict] = arch.get("edges", [])
 
     all_service_names = set(services) | externals
 
     node_query = """
     MERGE (s:MeshService {name: $name})
-    SET s.is_external = $is_external, s.system = $system
+    SET s.is_external = $is_external,
+        s.system = $system,
+        s.dependency_type = $dependency_type,
+        s.ownership = $ownership,
+        s.is_third_party_api = $is_third_party_api,
+        s.is_in_mesh_topology = $is_in_mesh_topology
     """
     edge_query = """
     MERGE (src:MeshService {name: $from_svc})
@@ -229,7 +240,29 @@ def _ingest_architecture(url: str, username: str, password: str, database: str, 
     with GraphDatabase.driver(url, auth=(username, password)) as driver:
         with driver.session(database=database) as session:
             for name in all_service_names:
-                session.run(node_query, name=name, is_external=(name in externals), system=system)
+                is_external = name in externals
+                label = external_labels.get(name, {}) if is_external else {}
+                dependency_type = str(label.get("dependency_type", "")).strip()
+                if not dependency_type:
+                    dependency_type = "third_party_api" if is_external else "internal_service"
+
+                ownership = str(label.get("ownership", "")).strip()
+                if not ownership:
+                    ownership = "external_not_owned" if is_external else "internal_owned"
+
+                is_third_party_api = dependency_type == "third_party_api"
+                is_in_mesh_topology = bool(label.get("is_in_mesh_topology", True))
+
+                session.run(
+                    node_query,
+                    name=name,
+                    is_external=is_external,
+                    system=system,
+                    dependency_type=dependency_type,
+                    ownership=ownership,
+                    is_third_party_api=is_third_party_api,
+                    is_in_mesh_topology=is_in_mesh_topology,
+                )
             for edge in edges:
                 session.run(
                     edge_query,
@@ -363,6 +396,9 @@ def run_pipeline(
     fixture_root: Path,
     reset_graph: bool = True,
     brain_report_log_path: Path | None = None,
+    trace: bool = False,
+    show_mermaid: bool = False,
+    mermaid_out: Path | None = None,
 ) -> int:
     incident_dir = fixture_root / "incident"
     diffs_root = fixture_root / "diffs"
@@ -487,7 +523,18 @@ def run_pipeline(
                 report_log_path=str(brain_report_log_path) if brain_report_log_path else None,
             )
         )
-        report = engine.run(incident)
+
+        if show_mermaid or mermaid_out is not None:
+            mermaid = engine.get_topology_mermaid()
+            if show_mermaid:
+                print("\nLangGraph topology (Mermaid)")
+                print(mermaid)
+            if mermaid_out is not None:
+                mermaid_out.parent.mkdir(parents=True, exist_ok=True)
+                mermaid_out.write_text(mermaid + "\n", encoding="utf-8")
+                print(f"Mermaid topology written to: {mermaid_out}")
+
+        report = engine.run(incident, trace=trace)
     finally:
         mesh_driver.close()
 
@@ -542,12 +589,30 @@ def main() -> None:
         default=None,
         help="Optional output path for BrainEngine JSON report log (defaults to fixture_root/brain_runs/).",
     )
+    parser.add_argument(
+        "--trace",
+        action="store_true",
+        help="Stream LangGraph node-by-node updates to terminal.",
+    )
+    parser.add_argument(
+        "--show-mermaid",
+        action="store_true",
+        help="Print LangGraph Mermaid topology to terminal.",
+    )
+    parser.add_argument(
+        "--mermaid-out",
+        default=None,
+        help="Optional path to write Mermaid topology text.",
+    )
     args = parser.parse_args()
 
     exit_code = run_pipeline(
         Path(args.fixture_root),
         reset_graph=not args.no_reset,
         brain_report_log_path=Path(args.brain_log) if args.brain_log else None,
+        trace=args.trace,
+        show_mermaid=args.show_mermaid,
+        mermaid_out=Path(args.mermaid_out) if args.mermaid_out else None,
     )
     raise SystemExit(exit_code)
 
