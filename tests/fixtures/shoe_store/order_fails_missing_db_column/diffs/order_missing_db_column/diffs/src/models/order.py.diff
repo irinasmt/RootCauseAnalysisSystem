@@ -1,0 +1,10 @@
+--- a/src/models/order.py
++++ b/src/models/order.py
+@@ -9,6 +9,7 @@
+ @dataclass
+ class Order:
+     order_id: str
+     customer_id: str
+     total_amount: float
+     status: str
++    promo_code: Optional[str] = None  # added in migration 0012

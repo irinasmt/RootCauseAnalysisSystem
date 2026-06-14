@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "postToolUse": [
+      {
+        "type": "command",
+        "powershell": "./run-tests-on-edit.ps1",
+        "cwd": ".github/hooks/scripts",
+        "timeoutSec": 60
+      }
+    ]
+  }
+}

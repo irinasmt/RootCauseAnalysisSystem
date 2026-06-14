@@ -1,0 +1,63 @@
+{
+  "slow_queries": [
+    {
+      "service": "payment-service",
+      "database": "payments_db",
+      "query_hash": "0x5A3F8B2C1D4E9F07",
+      "query_text": "SELECT o.order_id, o.amount, p.status FROM orders o JOIN payments p ON o.payment_id = p.id WHERE o.created_at > @since AND p.status = 'pending'",
+      "avg_duration_ms": 4823.5,
+      "execution_count": 1872,
+      "observed_at": "2026-03-16T10:15:00Z"
+    },
+    {
+      "service": "payment-service",
+      "database": "payments_db",
+      "query_hash": "0x1B7D3A5E8C2F4091",
+      "query_text": "UPDATE payments SET status = 'settled', settled_at = GETUTCDATE() WHERE payment_id = @id",
+      "avg_duration_ms": 2110.0,
+      "execution_count": 642,
+      "observed_at": "2026-03-16T10:15:00Z"
+    },
+    {
+      "service": "order-service",
+      "database": "orders_db",
+      "query_hash": "0x3C9E6F1A0B8D7254",
+      "query_text": "SELECT i.sku, i.quantity FROM inventory i WITH (UPDLOCK) WHERE i.sku IN (SELECT sku FROM order_lines WHERE order_id = @oid)",
+      "avg_duration_ms": 1540.0,
+      "execution_count": 3204,
+      "observed_at": "2026-03-16T10:15:00Z"
+    }
+  ],
+  "wait_stats": [
+    {
+      "service": "payment-service",
+      "database": "payments_db",
+      "wait_type": "LCK_M_X",
+      "waiting_tasks_count": 5812,
+      "wait_time_ms": 182400.0,
+      "max_wait_time_ms": 29500.0,
+      "blocking_session_id": 58,
+      "observed_at": "2026-03-16T10:15:00Z"
+    },
+    {
+      "service": "payment-service",
+      "database": "payments_db",
+      "wait_type": "PAGEIOLATCH_SH",
+      "waiting_tasks_count": 1204,
+      "wait_time_ms": 44200.0,
+      "max_wait_time_ms": 3100.0,
+      "blocking_session_id": null,
+      "observed_at": "2026-03-16T10:15:00Z"
+    },
+    {
+      "service": "order-service",
+      "database": "orders_db",
+      "wait_type": "LCK_M_U",
+      "waiting_tasks_count": 2401,
+      "wait_time_ms": 67800.0,
+      "max_wait_time_ms": 15200.0,
+      "blocking_session_id": 71,
+      "observed_at": "2026-03-16T10:15:00Z"
+    }
+  ]
+}

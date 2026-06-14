@@ -43,23 +43,11 @@ What it does:
 - Full distributed tracing requirements
 - “Perfect attribution” for every incident
 
-## How we work (SDD + Spec Kit)
+## How we work
 
-This repository uses Spec-Driven Development (SDD) with Spec Kit.
+This repository uses Spec-Driven Development (SDD).
 
-- Spec Kit repo: https://github.com/github/spec-kit
 - SDD project guide: [specs/README.md](specs/README.md)
-- Project constitution: [.specify/memory/constitution.md](.specify/memory/constitution.md)
-
-Recommended feature flow:
-
-1. `/speckit.constitution`
-2. `/speckit.specify`
-3. `/speckit.clarify` (if needed)
-4. `/speckit.plan`
-5. `/speckit.tasks`
-6. `/speckit.analyze` and `/speckit.checklist`
-7. `/speckit.implement`
 
 Active feature artifacts live in numbered folders under `specs/` (for example `specs/001-build-realistic-mock/`).
 

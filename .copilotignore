@@ -1,0 +1,4 @@
+# Exclude Spec Kit tooling from Copilot indexing.
+# These files contain /speckit.* slash-command references that Copilot
+# misreads as suggested actions. They are dev-workflow scaffolding only.
+.specify/
