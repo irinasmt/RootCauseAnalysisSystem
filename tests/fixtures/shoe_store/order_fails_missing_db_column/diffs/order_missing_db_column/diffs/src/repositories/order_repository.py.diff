@@ -1,0 +1,14 @@
+--- a/src/repositories/order_repository.py
++++ b/src/repositories/order_repository.py
+@@ -13,7 +13,7 @@
+             cur.execute(
+                 """
+-                INSERT INTO orders (order_id, customer_id, total_amount, status)
+-                VALUES (%s, %s, %s, %s)
++                INSERT INTO orders (order_id, customer_id, total_amount, status, promo_code)
++                VALUES (%s, %s, %s, %s, %s)
+                 """,
+-                (order.order_id, order.customer_id, order.total_amount, order.status),
++                (order.order_id, order.customer_id, order.total_amount, order.status, order.promo_code),
+             )
+         self._conn.commit()

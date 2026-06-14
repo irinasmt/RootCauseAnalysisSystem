@@ -1,7 +1,11 @@
 import json
 from pathlib import Path
 
-from rca.seed.shoe_store_seed import ARCHITECTURE, generate_order_slow_due_to_payment
+from rca.seed.shoe_store_seed import (
+    ARCHITECTURE,
+    generate_order_fails_missing_db_column,
+    generate_order_slow_due_to_payment,
+)
 
 
 def test_architecture_has_core_services():
@@ -47,3 +51,50 @@ def test_order_logs_do_not_use_synthetic_error_token(tmp_path: Path):
     order_log = Path(result["incident_dir"]) / "order_logs.log"
     text = order_log.read_text(encoding="utf-8")
     assert "payment_dependency_timeout" not in text
+
+
+# ---------------------------------------------------------------------------
+# order_fails_missing_db_column
+# ---------------------------------------------------------------------------
+
+
+def test_generate_order_fails_missing_db_column_writes_expected_artifacts(tmp_path: Path):
+    result = generate_order_fails_missing_db_column(output_root=tmp_path)
+
+    scenario_dir = Path(result["scenario_dir"])
+    incident_dir = scenario_dir / "incident"
+    diff_dir = Path(result["diff_dir"])
+
+    assert (scenario_dir / "architecture.json").exists()
+    assert (incident_dir / "manifest.json").exists()
+    assert (incident_dir / "ground_truth.json").exists()
+    assert (incident_dir / "mesh_events.jsonl").exists()
+    assert (incident_dir / "order_logs.log").exists()
+    assert (incident_dir / "ui_events.log").exists()
+
+    assert (diff_dir / "manifest.json").exists()
+    assert (diff_dir / "files" / "src" / "models" / "order.py").exists()
+    assert (diff_dir / "files" / "src" / "repositories" / "order_repository.py").exists()
+    assert (diff_dir / "files" / "migrations" / "0012_add_promo_code.sql").exists()
+    assert (diff_dir / "diffs" / "src" / "models" / "order.py.diff").exists()
+
+
+def test_mesh_fixture_missing_column_contains_ui_to_order_failing_edge(tmp_path: Path):
+    result = generate_order_fails_missing_db_column(output_root=tmp_path)
+    mesh_path = Path(result["incident_dir"]) / "mesh_events.jsonl"
+    rows = [json.loads(line) for line in mesh_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+    assert any(r["service"] == "ui-web" and r["upstream"] == "order-service" for r in rows)
+    incident_500_rows = [
+        r for r in rows
+        if r["service"] == "ui-web" and r["upstream"] == "order-service" and r["response_code"] == 500
+    ]
+    assert len(incident_500_rows) > 0
+
+
+def test_order_logs_missing_column_contain_db_error_tokens(tmp_path: Path):
+    result = generate_order_fails_missing_db_column(output_root=tmp_path)
+    order_log = Path(result["incident_dir"]) / "order_logs.log"
+    text = order_log.read_text(encoding="utf-8")
+    assert "db_insert_failed" in text
+    assert "promo_code" in text

@@ -1,0 +1,16 @@
+{
+  "artifacts": [
+    "ui_events.log",
+    "order_logs.log",
+    "mesh_events.jsonl"
+  ],
+  "changed_services": [
+    "order-service"
+  ],
+  "diff_fixture": "diffs/order_missing_db_column",
+  "incident_window_end": "2026-03-15T10:30:00+00:00",
+  "incident_window_start": "2026-03-15T10:15:00+00:00",
+  "scenario_id": "order_fails_missing_db_column",
+  "time_anchor": "2026-03-15T10:00:00+00:00",
+  "triggered_service": "order-service"
+}

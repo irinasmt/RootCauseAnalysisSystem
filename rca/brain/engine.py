@@ -25,7 +25,10 @@ import os
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
+
+if TYPE_CHECKING:
+    from rca.connectors.sqlserver import SqlServerAdapter
 
 from langgraph.graph import END, StateGraph
 
@@ -41,9 +44,10 @@ class BrainEngineConfig:
     fix_confidence_threshold: float = 0.75  # fix_advisor score needed to resolve despite low critic_score
     max_iterations: int = 3
     llm_config: LLMConfig | None = field(default=None)
-    graph_index: object | None = None
+    graph_index: object | None = None  # LlamaIndex graph store used by git_scout for code/commit retrieval
     mesh_driver: object | None = None  # neo4j.Driver for mesh graph traversal
-    report_log_path: str | None = field(default_factory=lambda: os.environ.get("BRAIN_REPORT_LOG_PATH"))
+    report_log_path: str | None = field(default_factory=lambda: os.environ.get("BRAIN_REPORT_LOG_PATH"))  # path to write the JSON report log; reads BRAIN_REPORT_LOG_PATH env var
+    sqlserver_adapter: SqlServerAdapter | None = None  # Optional SQL Server connector for DB evidence
 
 
 class BrainEngine:

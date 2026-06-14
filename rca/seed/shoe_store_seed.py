@@ -134,6 +134,126 @@ PAYMENT_TIMEOUT_TIGHTENING = MockDiffBundle(
 )
 
 
+# ---------------------------------------------------------------------------
+# order_fails_missing_db_column scenario
+# ---------------------------------------------------------------------------
+
+_ORDER_MODEL_AFTER = '''\
+"""ORM model for the orders table."""
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Optional
+
+
+@dataclass
+class Order:
+    order_id: str
+    customer_id: str
+    total_amount: float
+    status: str
+    promo_code: Optional[str] = None  # added in migration 0012
+'''
+
+_ORDER_MODEL_DIFF = '''\
+--- a/src/models/order.py
++++ b/src/models/order.py
+@@ -9,6 +9,7 @@
+ @dataclass
+ class Order:
+     order_id: str
+     customer_id: str
+     total_amount: float
+     status: str
++    promo_code: Optional[str] = None  # added in migration 0012
+'''
+
+_ORDER_REPO_AFTER = '''\
+"""Repository for persisting orders to PostgreSQL."""
+from __future__ import annotations
+
+import psycopg2
+
+
+class OrderRepository:
+    def __init__(self, conn: psycopg2.extensions.connection) -> None:
+        self._conn = conn
+
+    def insert(self, order) -> None:
+        with self._conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO orders (order_id, customer_id, total_amount, status, promo_code)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                (order.order_id, order.customer_id, order.total_amount, order.status, order.promo_code),
+            )
+        self._conn.commit()
+'''
+
+_ORDER_REPO_DIFF = '''\
+--- a/src/repositories/order_repository.py
++++ b/src/repositories/order_repository.py
+@@ -13,7 +13,7 @@
+             cur.execute(
+                 """
+-                INSERT INTO orders (order_id, customer_id, total_amount, status)
+-                VALUES (%s, %s, %s, %s)
++                INSERT INTO orders (order_id, customer_id, total_amount, status, promo_code)
++                VALUES (%s, %s, %s, %s, %s)
+                 """,
+-                (order.order_id, order.customer_id, order.total_amount, order.status),
++                (order.order_id, order.customer_id, order.total_amount, order.status, order.promo_code),
+             )
+         self._conn.commit()
+'''
+
+_PROMO_MIGRATION_AFTER = '''\
+-- Migration 0012: add promo_code column to orders table
+-- Run with: psql $DATABASE_URL -f migrations/0012_add_promo_code.sql
+
+ALTER TABLE orders ADD COLUMN promo_code VARCHAR(50);
+'''
+
+_PROMO_MIGRATION_DIFF = '''\
+--- /dev/null
++++ b/migrations/0012_add_promo_code.sql
+@@ -0,0 +1,4 @@
++-- Migration 0012: add promo_code column to orders table
++-- Run with: psql $DATABASE_URL -f migrations/0012_add_promo_code.sql
++
++ALTER TABLE orders ADD COLUMN promo_code VARCHAR(50);
+'''
+
+ORDER_MISSING_DB_COLUMN = MockDiffBundle(
+    scenario_id="order_missing_db_column",
+    description=(
+        "order-service deployed with code referencing a new 'promo_code' column, "
+        "but migration 0012_add_promo_code.sql was not applied; every order INSERT "
+        "fails with 'column promo_code of relation orders does not exist'."
+    ),
+    service="order-service",
+    commit_sha="ordmig0012",
+    files={
+        "src/models/order.py": FileEntry(
+            content=_ORDER_MODEL_AFTER,
+            diff=_ORDER_MODEL_DIFF,
+            language="python",
+        ),
+        "src/repositories/order_repository.py": FileEntry(
+            content=_ORDER_REPO_AFTER,
+            diff=_ORDER_REPO_DIFF,
+            language="python",
+        ),
+        "migrations/0012_add_promo_code.sql": FileEntry(
+            content=_PROMO_MIGRATION_AFTER,
+            diff=_PROMO_MIGRATION_DIFF,
+            language="text",
+        ),
+    },
+)
+
+
 def _write_mock_diff_bundle(bundle: MockDiffBundle, out_dir: Path) -> None:
     files_dir = out_dir / "files"
     diffs_dir = out_dir / "diffs"
@@ -327,6 +447,154 @@ def generate_order_slow_due_to_payment(
         "incident_dir": str(incident_dir),
         "diff_dir": str(diff_dir),
         "scenario_id": "order_slow_due_to_payment",
+    }
+
+
+def _mesh_events_missing_column(anchor: datetime) -> list[dict]:
+    rows: list[dict] = []
+    for i in range(30):
+        ts = anchor + timedelta(minutes=i)
+        incident = i >= 15
+
+        # ui-web -> order-service: 500 as soon as DB INSERT fails on missing column
+        rows.append(
+            {
+                "ts": ts.isoformat(),
+                "stream": "mesh",
+                "service": "ui-web",
+                "upstream": "order-service",
+                "latency_ms": 45 if incident else 90,
+                "retry_count": 0,
+                "response_code": 500 if incident else 200,
+                "policy": "default",
+                "correlation_id": f"corr-ui-ord-{i:03d}",
+            }
+        )
+
+        # order-service -> inventory-service: silent during incident (order fails at DB before inventory check)
+        if not incident:
+            rows.append(
+                {
+                    "ts": ts.isoformat(),
+                    "stream": "mesh",
+                    "service": "order-service",
+                    "upstream": "inventory-service",
+                    "latency_ms": 55,
+                    "retry_count": 0,
+                    "response_code": 200,
+                    "policy": "default",
+                    "correlation_id": f"corr-ord-inv-{i:03d}",
+                }
+            )
+    return rows
+
+
+def _txt_log_rows_missing_column(anchor: datetime) -> dict[str, list[str]]:
+    ui_rows: list[str] = []
+    order_rows: list[str] = []
+
+    for i in range(30):
+        ts = (anchor + timedelta(minutes=i)).isoformat()
+        incident = i >= 15
+
+        if incident:
+            ui_rows.append(
+                f"{ts} level=ERROR stream=ui route=/checkout message=checkout_failed status=500 correlation_id=ui-{i:03d}"
+            )
+            order_rows.append(
+                f"{ts} level=ERROR stream=order route=/orders status=500 message=db_insert_failed"
+                f" pg_error=\"column promo_code of relation orders does not exist\""
+                f" correlation_id=ord-{i:03d}"
+            )
+        else:
+            ui_rows.append(
+                f"{ts} level=INFO stream=ui route=/checkout message=checkout_ok correlation_id=ui-{i:03d}"
+            )
+            order_rows.append(
+                f"{ts} level=INFO stream=order route=/orders status=created latency_ms=185 correlation_id=ord-{i:03d}"
+            )
+
+    return {
+        "ui_events.log": ui_rows,
+        "order_logs.log": order_rows,
+    }
+
+
+def generate_order_fails_missing_db_column(
+    output_root: str | Path = "tests/fixtures/shoe_store",
+    *,
+    time_anchor: str | datetime = "2026-03-15T10:00:00+00:00",
+) -> dict:
+    root = Path(output_root)
+    scenario_dir = root / "order_fails_missing_db_column"
+    incident_dir = scenario_dir / "incident"
+    diff_dir = scenario_dir / "diffs" / ORDER_MISSING_DB_COLUMN.scenario_id
+    scenario_dir.mkdir(parents=True, exist_ok=True)
+    incident_dir.mkdir(parents=True, exist_ok=True)
+
+    if isinstance(time_anchor, str):
+        anchor = datetime.fromisoformat(time_anchor)
+    else:
+        anchor = time_anchor
+    if anchor.tzinfo is None:
+        anchor = anchor.replace(tzinfo=UTC)
+    else:
+        anchor = anchor.astimezone(UTC)
+
+    (scenario_dir / "architecture.json").write_text(
+        json.dumps(ARCHITECTURE, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    mesh_rows = _mesh_events_missing_column(anchor)
+    (incident_dir / "mesh_events.jsonl").write_text(
+        "\n".join(json.dumps(r, separators=(",", ":"), sort_keys=True) for r in mesh_rows) + "\n",
+        encoding="utf-8",
+    )
+
+    for name, rows in _txt_log_rows_missing_column(anchor).items():
+        (incident_dir / name).write_text("\n".join(rows) + "\n", encoding="utf-8")
+
+    manifest = {
+        "scenario_id": "order_fails_missing_db_column",
+        "triggered_service": "order-service",
+        "changed_services": ["order-service"],
+        "time_anchor": anchor.isoformat(),
+        "incident_window_start": (anchor + timedelta(minutes=15)).isoformat(),
+        "incident_window_end": (anchor + timedelta(minutes=30)).isoformat(),
+        "artifacts": [
+            "ui_events.log",
+            "order_logs.log",
+            "mesh_events.jsonl",
+        ],
+        "diff_fixture": f"diffs/{ORDER_MISSING_DB_COLUMN.scenario_id}",
+    }
+    (incident_dir / "manifest.json").write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+
+    ground_truth = {
+        "scenario_id": "order_fails_missing_db_column",
+        "trigger": "order_service_deployment_without_migration",
+        "root_cause": "missing_db_migration_promo_code_column",
+        "affected_service": "order-service",
+        "changed_service": "order-service",
+        "failing_edge": "ui-web->order-service",
+        "upstream_failing_edge": "order-service->orders-db",
+        "expected_first_signal": "order_service_500_on_db_insert_missing_column",
+    }
+    (incident_dir / "ground_truth.json").write_text(
+        json.dumps(ground_truth, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    _write_mock_diff_bundle(ORDER_MISSING_DB_COLUMN, diff_dir)
+
+    return {
+        "scenario_dir": str(scenario_dir),
+        "incident_dir": str(incident_dir),
+        "diff_dir": str(diff_dir),
+        "scenario_id": "order_fails_missing_db_column",
     }
 
 

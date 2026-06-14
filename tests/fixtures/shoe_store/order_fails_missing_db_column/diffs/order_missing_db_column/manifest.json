@@ -1,0 +1,26 @@
+{
+  "scenario_id": "order_missing_db_column",
+  "service": "order-service",
+  "commit_sha": "ordmig0012",
+  "description": "order-service deployed with code referencing a new 'promo_code' column, but migration 0012_add_promo_code.sql was not applied; every order INSERT fails with 'column promo_code of relation orders does not exist'.",
+  "files": [
+    {
+      "path": "src/models/order.py",
+      "language": "python",
+      "content_file": "files/src/models/order.py",
+      "diff_file": "diffs/src/models/order.py.diff"
+    },
+    {
+      "path": "src/repositories/order_repository.py",
+      "language": "python",
+      "content_file": "files/src/repositories/order_repository.py",
+      "diff_file": "diffs/src/repositories/order_repository.py.diff"
+    },
+    {
+      "path": "migrations/0012_add_promo_code.sql",
+      "language": "text",
+      "content_file": "files/migrations/0012_add_promo_code.sql",
+      "diff_file": "diffs/migrations/0012_add_promo_code.sql.diff"
+    }
+  ]
+}

@@ -81,3 +81,58 @@ LLM (optional)
 - **Service identity drift**: relying on ad-hoc labels makes correlation fragile; standardize early.
 - **Commit mapping gaps**: image tags rarely equal commit SHAs in real CI/CD; require OCI labels or annotations.
 - **Evidence references**: don’t let reports inline raw data; reference stored evidence artifacts.
+---
+
+## SQL Server Connector (`rca/connectors/sqlserver/`)
+
+The SQL Server connector surfaces slow-query evidence (via `sys.dm_exec_query_stats`) and wait-stat / blocking-chain evidence (via `sys.dm_os_wait_stats`) for Brain's `MetricAnalyst` node.
+
+The connector activates only when `pyodbc` is installed and `SQLSERVER_DSN` is set. When either is absent the rest of the system loads without error.
+
+### Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `SQLSERVER_DSN` | **Yes** | — | Full ODBC connection string. Example: `DRIVER={ODBC Driver 18 for SQL Server};SERVER=localhost,1433;UID=sa;PWD=secret;TrustServerCertificate=yes` |
+| `SQLSERVER_DATABASE` | No | `master` | Database name to target when querying DMVs. |
+
+### Installation
+
+```bash
+pip install pyodbc
+```
+
+The Microsoft ODBC Driver 18 for SQL Server must also be installed on the host:
+
+- **Windows**: [Download from Microsoft](https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server)
+- **Linux (Ubuntu/Debian)**: Follow the [Microsoft apt install guide](https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server)
+
+### Wiring into BrainEngineConfig
+
+```python
+from rca.connectors.sqlserver import create_sqlserver_connector
+from rca.brain import BrainEngine, BrainEngineConfig
+
+config = BrainEngineConfig(
+    sqlserver_adapter=create_sqlserver_connector(),  # reads SQLSERVER_DSN from env
+)
+engine = BrainEngine(config=config)
+```
+
+### Running unit tests (no SQL Server required)
+
+```bash
+pytest tests/unit/test_sqlserver_connector.py -q
+```
+
+### Running Docker integration tests
+
+```bash
+pytest tests/integration/test_sqlserver_docker.py -q -m docker
+```
+
+Requires Docker Desktop running locally and `testcontainers` installed:
+
+```bash
+pip install testcontainers
+```
