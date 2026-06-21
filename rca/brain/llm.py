@@ -29,7 +29,11 @@ class LLMConfig(BaseModel):
 
 
 class LLMClient:
-    """Thin wrapper around the Gemini generative model (google-genai SDK)."""
+    """Wrapper around the Gemini generative model (google-genai SDK).
+    
+    Provides simplified access to Gemini's content generation capabilities
+    with built-in JSON response parsing and markdown fence stripping.
+    """
 
     def __init__(self, config: LLMConfig) -> None:
         from google import genai
@@ -42,6 +46,14 @@ class LLMClient:
         )
 
     def generate(self, prompt: str) -> str:
+        """Generate text completion from the LLM.
+        
+        Args:
+            prompt: The input prompt text.
+            
+        Returns:
+            Generated text with leading/trailing whitespace removed.
+        """
         response = self._client.models.generate_content(
             model=self._model,
             contents=prompt,
@@ -50,8 +62,23 @@ class LLMClient:
         return response.text.strip()
 
     def generate_json(self, prompt: str) -> dict[str, Any]:
+        """Generate and parse JSON response from the LLM.
+        
+        Automatically strips markdown code fences (```json...```) that some
+        models add around JSON responses.
+        
+        Args:
+            prompt: The input prompt text.
+            
+        Returns:
+            Parsed JSON as a Python dictionary.
+            
+        Raises:
+            json.JSONDecodeError: If the response is not valid JSON after
+                                   stripping markdown fences.
+        """
         raw = self.generate(prompt)
-        # Strip markdown code fences that some models wrap JSON in
+        # Strip markdown code fences that some models wrap JSON responses in
         text = raw
         if text.startswith("```"):
             lines = text.splitlines()
