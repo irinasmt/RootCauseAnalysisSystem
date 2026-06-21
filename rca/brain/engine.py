@@ -156,7 +156,6 @@ class BrainEngine:
         incident: ApprovedIncident,
         *,
         trace: bool = False,
-        trace_callback: Callable[[str], None] | None = None,
     ) -> RcaReport:
         initial = BrainState(
             incident=incident,
@@ -167,28 +166,27 @@ class BrainEngine:
         try:
             final: BrainState
             if trace:
-                emit = trace_callback or print
-                emit("LangGraph trace (stream_mode=updates)")
+                print("LangGraph trace (stream_mode=updates)")
                 last_state: BrainState | None = None
                 for chunk in self._graph.stream(initial, stream_mode="updates"):
                     if not isinstance(chunk, dict):
-                        emit(f"- update: {chunk}")
+                        print(f"- update: {chunk}")
                         continue
 
                     for node_name, node_update in chunk.items():
-                        emit(f"- node: {node_name}")
+                        print(f"- node: {node_name}")
                         if isinstance(node_update, dict):
                             if "status" in node_update:
-                                emit(f"    status={node_update.get('status')}")
+                                print(f"    status={node_update.get('status')}")
                             if "iteration" in node_update:
-                                emit(f"    iteration={node_update.get('iteration')}")
+                                print(f"    iteration={node_update.get('iteration')}")
                             if "suspect_services" in node_update:
                                 suspects = node_update.get("suspect_services") or []
-                                emit(f"    suspects={len(suspects)}")
+                                print(f"    suspects={len(suspects)}")
                             if "critic_score" in node_update:
-                                emit(f"    critic_score={node_update.get('critic_score')}")
+                                print(f"    critic_score={node_update.get('critic_score')}")
                             if "fix_confidence" in node_update:
-                                emit(f"    fix_confidence={node_update.get('fix_confidence')}")
+                                print(f"    fix_confidence={node_update.get('fix_confidence')}")
 
                             try:
                                 last_state = BrainState.model_validate(node_update)
