@@ -40,6 +40,7 @@ class BrainEngineConfig:
     critic_threshold: float = 0.80
     fix_confidence_threshold: float = 0.75  # fix_advisor score needed to resolve despite low critic_score
     max_iterations: int = 3
+    node_timeout_seconds: int | None = 120  # Optional timeout for individual node execution (default: 120s)
     llm_config: LLMConfig | None = field(default=None)
     graph_index: object | None = None
     mesh_driver: object | None = None  # neo4j.Driver for mesh graph traversal
