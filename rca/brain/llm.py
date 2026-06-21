@@ -17,6 +17,10 @@ class LLMConfig(BaseModel):
 
     @classmethod
     def from_env(cls) -> "LLMConfig":
+        """Load LLM config from environment variables.
+        
+        Reads GEMINI_API_KEY for authentication. Legacy GOOGLE_API_KEY is no longer supported.
+        """
         return cls(
             api_key=os.environ.get("GEMINI_API_KEY", ""),
             model=os.environ.get("GEMINI_MODEL", "gemini-2.0-flash"),
