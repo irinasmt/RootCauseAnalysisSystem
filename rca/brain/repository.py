@@ -14,3 +14,12 @@ class InMemoryReportRepository:
 
     def get(self, incident_id: str) -> RcaReport | None:
         return self._reports.get(incident_id)
+
+    def list_all(self) -> list[RcaReport]:
+        return list(self._reports.values())
+
+    def delete(self, incident_id: str) -> bool:
+        if incident_id in self._reports:
+            del self._reports[incident_id]
+            return True
+        return False
