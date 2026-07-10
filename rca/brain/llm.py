@@ -52,9 +52,9 @@ class LLMClient:
     def generate_json(self, prompt: str) -> dict[str, Any]:
         raw = self.generate(prompt)
         # Strip markdown code fences that some models wrap JSON in
-        text = raw
+        text = raw.strip()
         if text.startswith("```"):
             lines = text.splitlines()
             end = len(lines) - 1 if lines[-1].strip() == "```" else len(lines)
-            text = "\n".join(lines[1:end])
+            text = "\n".join(lines[1:end]).strip()
         return json.loads(text)
