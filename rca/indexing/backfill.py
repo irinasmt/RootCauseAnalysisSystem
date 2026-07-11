@@ -103,8 +103,10 @@ class BackfillRunner:
         total_nodes = 0
 
         # Process in batches
+        # Fixed: Correct batch end calculation (was: batch_start + policy.batch_size + 1)
         for batch_start in range(0, len(commit_shas), policy.batch_size):
-            batch = commit_shas[batch_start: batch_start + policy.batch_size]
+            batch_end = batch_start + policy.batch_size  # Fixed off-by-one
+            batch = commit_shas[batch_start:batch_end]
             for sha in batch:
                 request = DifferentialIndexerRequest(service=service, commit_sha=sha)
                 nodes_upserted, commit_diags = self._indexer.index_commit(request)
