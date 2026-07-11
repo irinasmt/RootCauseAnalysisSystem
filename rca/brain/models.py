@@ -33,6 +33,28 @@ class RcaReport(BaseModel):
     errors: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
 
+    def summarize(self) -> "RcaReportSummary":
+        top = max(self.hypotheses, key=lambda h: h.confidence, default=None)
+        return RcaReportSummary(
+            incident_id=self.incident_id,
+            status=self.status,
+            top_hypothesis=top.title if top else None,
+            top_confidence=top.confidence if top else 0.0,
+            fix_confidence=self.fix_confidence,
+            error_count=len(self.errors),
+        )
+
+
+class RcaReportSummary(BaseModel):
+    """Lightweight summary of an RcaReport for display and alerting use cases."""
+
+    incident_id: str
+    status: Literal["completed", "escalated", "failed"]
+    top_hypothesis: str | None
+    top_confidence: float = Field(ge=0.0, le=1.0)
+    fix_confidence: float = Field(ge=0.0, le=1.0)
+    error_count: int
+
 
 class BrainState(BaseModel):
     incident: ApprovedIncident
