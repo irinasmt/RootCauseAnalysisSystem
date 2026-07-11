@@ -25,7 +25,7 @@ import os
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable
+from typing import Any, Callable
 
 from langgraph.graph import END, StateGraph
 
@@ -64,6 +64,33 @@ class BrainEngine:
     def get_topology_mermaid(self) -> str:
         """Return Mermaid topology for the compiled LangGraph."""
         return self._graph.get_graph().draw_mermaid()
+
+    def get_health_status(self) -> dict[str, Any]:
+        """Return detailed health status and configuration diagnostics.
+        
+        This endpoint provides visibility into the Brain Engine's readiness state,
+        including LLM connectivity, graph index availability, and configuration details.
+        
+        Returns:
+            Dictionary with health status including:
+            - ready: bool - whether the engine is ready to process incidents
+            - llm_configured: bool - whether LLM client is available
+            - graph_index_available: bool - whether code graph index is connected
+            - mesh_driver_available: bool - whether mesh driver is connected
+            - config: dict - current configuration values
+        """
+        return {
+            "ready": self._llm is not None,
+            "llm_configured": self._llm is not None,
+            "graph_index_available": self.config.graph_index is not None,
+            "mesh_driver_available": self.config.mesh_driver is not None,
+            "config": {
+                "critic_threshold": self.config.critic_threshold,
+                "fix_confidence_threshold": self.config.fix_confidence_threshold,
+                "max_iterations": self.config.max_iterations,
+                "report_log_path": self.config.report_log_path,
+            },
+        }
 
     def _persist_report_log(self, report: RcaReport) -> None:
         if not self.config.report_log_path:
