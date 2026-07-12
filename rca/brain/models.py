@@ -7,6 +7,9 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+Severity = Literal["critical", "high", "medium", "low"]
+"""Operational severity of an RCA report, ordered from most to least urgent."""
+
 
 class ApprovedIncident(BaseModel):
     incident_id: str = Field(min_length=3)
@@ -29,18 +32,44 @@ class RcaReport(BaseModel):
     status: Literal["completed", "escalated", "failed"]
     critic_score: float = Field(ge=0.0, le=1.0, default=0.0)
     fix_confidence: float = Field(ge=0.0, le=1.0, default=0.0)
+    severity: Severity = "medium"
     hypotheses: list[Hypothesis] = Field(default_factory=list)
     errors: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+    def derive_severity(self) -> Severity:
+        """Classify operational urgency from status, confidence, and errors.
+
+        A report the engine could not complete (``failed``) or that hit runtime
+        errors is always at least ``high`` — those need a human regardless of how
+        confident the surviving hypotheses look. Otherwise severity tracks how
+        actionable the result is: a completed report with a strong fix is ``low``,
+        while an escalation with no confident remediation stays ``critical``.
+        """
+        if self.status == "failed" or self.errors:
+            return "critical" if self.status == "failed" else "high"
+        if self.status == "escalated":
+            return "high" if self.fix_confidence < 0.5 else "medium"
+        # status == "completed"
+        if self.fix_confidence >= 0.75 and self.critic_score >= 0.80:
+            return "low"
+        return "medium"
+
+    @property
+    def is_actionable(self) -> bool:
+        """True when there is a confident remediation an on-call can act on now."""
+        return self.status != "failed" and self.fix_confidence >= 0.75
 
     def summarize(self) -> "RcaReportSummary":
         top = max(self.hypotheses, key=lambda h: h.confidence, default=None)
         return RcaReportSummary(
             incident_id=self.incident_id,
             status=self.status,
+            severity=self.derive_severity(),
             top_hypothesis=top.title if top else None,
             top_confidence=top.confidence if top else 0.0,
             fix_confidence=self.fix_confidence,
+            is_actionable=self.is_actionable,
             error_count=len(self.errors),
         )
 
@@ -50,9 +79,11 @@ class RcaReportSummary(BaseModel):
 
     incident_id: str
     status: Literal["completed", "escalated", "failed"]
+    severity: Severity = "medium"
     top_hypothesis: str | None
     top_confidence: float = Field(ge=0.0, le=1.0)
     fix_confidence: float = Field(ge=0.0, le=1.0)
+    is_actionable: bool = False
     error_count: int
 
 
