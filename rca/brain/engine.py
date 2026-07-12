@@ -30,7 +30,7 @@ from typing import Callable
 from langgraph.graph import END, StateGraph
 
 from .llm import LLMClient, LLMConfig
-from .models import ApprovedIncident, BrainState, RcaReport
+from .models import ApprovedIncident, BrainState, RcaReport, RcaReportSummary
 from .nodes import critic, fix_advisor, git_scout, mesh_scout, metric_analyst, rca_synthesizer, supervisor
 from .repository import InMemoryReportRepository
 
@@ -218,6 +218,7 @@ class BrainEngine:
                 hypotheses=final.hypotheses,
                 errors=final.errors,
                 metadata={
+                    "severity": None,  # backfilled below once the report exists
                     "iteration": final.iteration,
                     "max_iterations": final.max_iterations,
                     "llm_enabled": self._llm is not None,
@@ -238,6 +239,8 @@ class BrainEngine:
                     "evidence_refs": final.evidence_refs,
                 },
             )
+            report.severity = report.derive_severity()
+            report.metadata["severity"] = report.severity
             self.repository.save(report)
             self._persist_report_log(report)
             return report
@@ -249,6 +252,15 @@ class BrainEngine:
                 errors=[str(exc)],
                 metadata={},
             )
+            report.severity = report.derive_severity()
+            report.metadata["severity"] = report.severity
             self.repository.save(report)
             self._persist_report_log(report)
             return report
+
+    def summarize_all(self) -> list[RcaReportSummary]:
+        """Return lightweight summaries of every report this engine has produced.
+
+        Convenience wrapper over the repository for dashboard/alerting callers.
+        """
+        return self.repository.summaries()
